@@ -155,7 +155,7 @@ const menuItems = computed(() => [
       {
         id: "theme",
         icon: isDark.value ? Moon : Sun,
-        title: isDark.value ? (t("settings.lightMode") || "Light Mode") : (t("settings.darkMode") || "Dark Mode"),
+        title: isDark.value ? (t("settings.darkMode") || "Dark Mode") : (t("settings.lightMode") || "Light Mode"),
         subtitle: t("settings.themeDesc") || "Toggle between light and dark theme",
         type: "toggle",
       },
@@ -388,7 +388,7 @@ const menuItems = computed(() => [
 
           <!-- App footer -->
           <div class="text-center pb-4">
-            <p class="text-[10px] text-slate-400 dark:text-neutral-700">RSB Cinema v1.0.0</p>
+            <p class="text-[10px] text-slate-400 dark:text-neutral-700">Ninja Booking v1.0.0</p>
           </div>
         </div>
       </div>

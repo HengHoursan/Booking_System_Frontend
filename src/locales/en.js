@@ -953,6 +953,7 @@ export default {
     newPassword: "New Password",
     confirmPassword: "Confirm Password",
     telegramConnected: "Telegram Connected",
+    general: "General Settings",
     logoutConfirm: {
       title: "Confirm Logout",
       message: "Are you sure you want to sign out?",
