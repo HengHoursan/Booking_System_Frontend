@@ -393,11 +393,11 @@ const onToggle = async (perm, roleName, val) => {
       }
     }
     assignments.value[perm.name][roleName] = val;
-    window?.ElMessage?.success?.("Updated");
+    window?.ElMessage?.success?.(t("system.updated"));
   } catch (error) {
     console.error("Update assignment failed:", error);
     window?.ElMessage?.error?.(
-      error?.response?.data?.message || "Update failed",
+      error?.response?.data?.message || t("system.updateFailed"),
     );
   } finally {
     toggling.value[key] = false;
@@ -410,13 +410,13 @@ const createPermission = async () => {
     !createForm.value.name ||
     !createForm.value.module
   ) {
-    window?.ElMessage?.warning?.("Display name, name and module are required");
+    window?.ElMessage?.warning?.(t("system.validationError"));
     return;
   }
   creating.value = true;
   try {
     await api.post("/permissions", createForm.value);
-    window?.ElMessage?.success?.("Permission created");
+    window?.ElMessage?.success?.(t("system.createSuccess"));
     createDialogVisible.value = false;
     createForm.value = {
       displayName: "",
@@ -428,7 +428,7 @@ const createPermission = async () => {
   } catch (error) {
     console.error("Create permission failed:", error);
     window?.ElMessage?.error?.(
-      error?.response?.data?.message || "Create failed",
+      error?.response?.data?.message || t("system.createFailed"),
     );
   } finally {
     creating.value = false;
@@ -445,20 +445,20 @@ const openCreateRoleDialog = () => {
 
 const createRole = async () => {
   if (!createRoleForm.value.displayName || !createRoleForm.value.name) {
-    window?.ElMessage?.warning?.("Display name and name are required");
+    window?.ElMessage?.warning?.(t("system.roleValidationError"));
     return;
   }
   creatingRole.value = true;
   try {
     await api.post("/roles", createRoleForm.value);
-    window?.ElMessage?.success?.("Role created");
+    window?.ElMessage?.success?.(t("system.roleCreateSuccess"));
     createRoleDialogVisible.value = false;
     createRoleForm.value = { displayName: "", name: "", description: "" };
     await refreshAll();
   } catch (error) {
     console.error("Create role failed:", error);
     window?.ElMessage?.error?.(
-      error?.response?.data?.message || "Create role failed",
+      error?.response?.data?.message || t("system.roleCreateFailed"),
     );
   } finally {
     creatingRole.value = false;

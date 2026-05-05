@@ -70,16 +70,14 @@ const fetchData = async () => {
 
 const getStatusColor = (status) => {
   switch (status) {
-    case "Confirmed":
-      return "#10b981"; // Green
     case "Completed":
-      return "#3b82f6"; // Blue
+      return "#10b981"; // Green
     case "Pending":
-      return "#f59e0b";
-    case "Cancelled":
-      return "#ef4444";
+      return "#f59e0b"; // Orange/Amber
+    case "Expired":
+      return "#ef4444"; // Red
     default:
-      return "#6b7280";
+      return "#6b7280"; // Gray
   }
 };
 

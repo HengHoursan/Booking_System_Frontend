@@ -68,7 +68,7 @@
             <el-option
               v-for="status in bookingStatusOptions"
               :key="status.value"
-              :label="status.label"
+              :label="$t('bookings.' + status.value.toLowerCase())"
               :value="status.value"
             />
           </el-select>
@@ -84,7 +84,7 @@
             <el-option
               v-for="status in paymentStatusOptions"
               :key="status.value"
-              :label="status.label"
+              :label="$t('bookings.' + status.value.toLowerCase())"
               :value="status.value"
             />
           </el-select>
@@ -197,7 +197,7 @@
             <el-tag
               :type="getStatusType(bookingStatusOptions, row.booking_status)"
             >
-              {{ row.booking_status }}
+              {{ $t('bookings.' + row.booking_status.toLowerCase()) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -206,7 +206,7 @@
             <el-tag
               :type="getStatusType(paymentStatusOptions, row.payment_status)"
             >
-              {{ row.payment_status }}
+              {{ row.payment_status ? $t('bookings.' + row.payment_status.toLowerCase()) : '-' }}
             </el-tag>
           </template>
         </el-table-column> -->
@@ -304,7 +304,7 @@
             <el-option
               v-for="status in bookingStatusOptions"
               :key="status.value"
-              :label="status.label"
+              :label="$t('bookings.' + status.value.toLowerCase())"
               :value="status.value"
             />
           </el-select>
@@ -314,7 +314,7 @@
             <el-option
               v-for="status in paymentStatusOptions"
               :key="status.value"
-              :label="status.label"
+              :label="$t('bookings.' + status.value.toLowerCase())"
               :value="status.value"
             />
           </el-select>
@@ -351,7 +351,7 @@
             <el-option
               v-for="method in paymentMethods"
               :key="method.value"
-              :label="method.label"
+              :label="$t('bookings.' + method.value.toLowerCase())"
               :value="method.value"
             />
           </el-select>
@@ -511,13 +511,13 @@ const canEditSeats = (booking) => {
     return false;
   }
   
-  // Cannot edit seats for cancelled bookings
-  if (booking.booking_status === 'Cancelled') {
+  // Cannot edit seats for expired bookings
+  if (booking.booking_status === 'Expired') {
     return false;
   }
   
-  // Can edit seats for Pending, Confirmed, and Completed bookings
-  return ['Pending', 'Confirmed', 'Completed'].includes(booking.booking_status);
+  // Can edit seats for Pending and Completed bookings
+  return ['Pending', 'Completed'].includes(booking.booking_status);
 };
 
 // Debug superadmin permissions
@@ -563,7 +563,7 @@ const editForm = reactive({
 watch(
   () => editForm.booking_status,
   (newStatus) => {
-    if (newStatus === "Cancelled") {
+    if (newStatus === "Expired") {
       editForm.payment_status = "Failed";
     }
   },

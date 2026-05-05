@@ -302,12 +302,11 @@ const recentBookings = ref([]);
 
 const getStatusType = (status) => {
   switch (status) {
-    case "Confirmed":
     case "Completed":
       return "success";
     case "Pending":
       return "warning";
-    case "Cancelled":
+    case "Expired":
       return "danger";
     default:
       return "info";
@@ -377,8 +376,8 @@ const loadDashboardData = async () => {
 };
 
 const getActionType = (action) => {
-  if (action.includes("DELETE") || action.includes("CANCEL")) return "danger";
-  if (action.includes("CREATE") || action.includes("CONFIRMED"))
+  if (action.includes("DELETE") || action.includes("EXPIRE")) return "danger";
+  if (action.includes("CREATE") || action.includes("COMPLETED"))
     return "success";
   if (action.includes("UPDATE")) return "warning";
   return "info";

@@ -38,13 +38,7 @@ const getStatusLabel = (status) => {
 
 const getMethodLabel = (method) => {
   if (!method) return t("n_a");
-  const mapping = {
-    Bakong: "payments.bakongPayment",
-    PayAtCinema: "payments.payAtCinema",
-    Cash: "payments.cashPayment",
-  };
-  const key = mapping[method];
-  if (!key) return method;
+  const key = `bookings.${method.toLowerCase()}`;
   const translated = t(key);
   return translated === key ? method : translated;
 };
@@ -52,11 +46,10 @@ const getMethodLabel = (method) => {
 const getStatusStyle = (status) => {
   switch (status) {
     case "Completed":
-    case "Confirmed":
       return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
     case "Pending":
       return "bg-amber-500/10 text-amber-400 border-amber-500/20";
-    case "Cancelled":
+    case "Expired":
     case "Failed":
       return "bg-red-500/10 text-red-400 border-red-500/20";
     default:
@@ -67,11 +60,10 @@ const getStatusStyle = (status) => {
 const getStatusDot = (status) => {
   switch (status) {
     case "Completed":
-    case "Confirmed":
       return "bg-emerald-400";
     case "Pending":
       return "bg-amber-400";
-    case "Cancelled":
+    case "Expired":
     case "Failed":
       return "bg-red-400";
     default:

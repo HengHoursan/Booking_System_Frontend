@@ -143,14 +143,14 @@
         </el-form-item>
 
         <!-- Poster Upload/URL -->
-        <!-- <el-form-item :label="$t('movies.poster')">
+        <el-form-item :label="$t('movies.poster')">
           <ImageUpload v-model="form.poster_url" />
-        </el-form-item> -->
+        </el-form-item>
 
         <!-- Trailer URL -->
-        <!-- <el-form-item :label="$t('movies.trailerUrl')">
+        <el-form-item :label="$t('movies.trailerUrl')">
           <el-input v-model="form.trailer_url" maxlength="500" />
-        </el-form-item> -->
+        </el-form-item>
 
         <!-- Producers -->
         <el-form-item :label="$t('movies.producers')">

@@ -37,7 +37,7 @@
                   getStatusType(bookingStatusOptions, booking.booking_status)
                 "
               >
-                {{ booking.booking_status }}
+                {{ $t('bookings.' + booking.booking_status.toLowerCase()) }}
               </el-tag>
             </el-descriptions-item>
             <el-descriptions-item :label="$t('bookings.paymentStatus')">
@@ -46,16 +46,16 @@
                   getStatusType(paymentStatusOptions, booking.payment_status)
                 "
               >
-                {{ booking.payment_status }}
+                {{ $t('bookings.' + booking.payment_status.toLowerCase()) }}
               </el-tag>
             </el-descriptions-item>
-            <el-descriptions-item :label="$t('payments.paymentMethod')">
+            <el-descriptions-item :label="$t('bookings.paymentMethod')">
               <el-tag
                 :type="
                   getStatusType(paymentMethodOptions, booking.payment_method)
                 "
               >
-                {{ booking.payment_method || $t("common.n_a") }}
+                {{ booking.payment_method ? $t('bookings.' + booking.payment_method.toLowerCase()) : $t("n_a") }}
               </el-tag>
             </el-descriptions-item>
           </el-descriptions>

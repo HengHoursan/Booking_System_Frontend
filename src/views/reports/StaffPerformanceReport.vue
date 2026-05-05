@@ -136,24 +136,25 @@
             <el-progress
               :percentage="row.completion_rate || 0"
               :show-text="false"
+              color="#67c23a"
             />
             <span class="text-xs">{{ row.completion_rate || 0 }}%</span>
           </template>
         </el-table-column>
         <el-table-column
-          prop="cancellation_rate"
-          :label="$t('reports.cancellationRate')"
+          prop="expiration_rate"
+          :label="$t('reports.expirationRate')"
           width="130"
           align="center"
           sortable
         >
           <template #default="{ row }">
             <el-progress
-              :percentage="row.cancellation_rate || 0"
+              :percentage="row.expiration_rate || 0"
               :show-text="false"
-              color="#f56c6c"
+              color="#909399"
             />
-            <span class="text-xs">{{ row.cancellation_rate || 0 }}%</span>
+            <span class="text-xs">{{ row.expiration_rate || 0 }}%</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -164,33 +165,23 @@
           sortable
         />
         <el-table-column
-          prop="confirmed_bookings"
-          :label="$t('reports.confirmedBookings')"
-          width="130"
-          align="center"
-        >
-          <template #default="{ row }">
-            <el-tag type="success">{{ row.confirmed_bookings }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column
           prop="completed_bookings"
           :label="$t('reports.completedBookings')"
           width="130"
           align="center"
         >
           <template #default="{ row }">
-            <el-tag type="info">{{ row.completed_bookings }}</el-tag>
+            <el-tag type="success">{{ row.completed_bookings }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column
-          prop="cancelled_bookings"
-          :label="$t('reports.cancelledBookings')"
+          prop="expired_bookings"
+          :label="$t('reports.expiredBookings')"
           width="130"
           align="center"
         >
           <template #default="{ row }">
-            <el-tag type="danger">{{ row.cancelled_bookings }}</el-tag>
+            <el-tag type="info">{{ row.expired_bookings }}</el-tag>
           </template>
         </el-table-column>
       </el-table>
@@ -273,7 +264,7 @@ const handleExport = (type) => {
       [t("reports.totalRevenueGenerated")]: item.total_revenue_generated,
       [t("reports.avgBookingValue")]: item.avg_booking_value,
       [t("reports.completionRate")]: item.completion_rate,
-      [t("reports.cancellationRate")]: item.cancellation_rate,
+      [t("reports.expirationRate")]: item.expiration_rate,
       [t("reports.totalSeatsSold")]: item.total_seats_sold,
     }));
     exportToCSV(data, filename);
@@ -286,7 +277,7 @@ const handleExport = (type) => {
       [t("reports.totalRevenueGenerated")]: item.total_revenue_generated,
       [t("reports.avgBookingValue")]: item.avg_booking_value,
       [t("reports.completionRate")]: item.completion_rate,
-      [t("reports.cancellationRate")]: item.cancellation_rate,
+      [t("reports.expirationRate")]: item.expiration_rate,
       [t("reports.totalSeatsSold")]: item.total_seats_sold,
     }));
     const totalRevenue = tableData.value.reduce((sum, item) => sum + (item.total_revenue_generated || 0), 0);
@@ -316,7 +307,7 @@ const handleExport = (type) => {
       { header: t("reports.totalRevenueGenerated"), dataKey: "revenue" },
       { header: t("reports.avgBookingValue"), dataKey: "avgValue" },
       { header: t("reports.completionRate"), dataKey: "completion" },
-      { header: t("reports.cancellationRate"), dataKey: "cancellation" },
+      { header: t("reports.expirationRate"), dataKey: "expiration" },
       { header: t("reports.totalSeatsSold"), dataKey: "seats" },
     ];
     const totalRevenue = tableData.value.reduce((sum, item) => sum + (item.total_revenue_generated || 0), 0);

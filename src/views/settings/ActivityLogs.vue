@@ -322,13 +322,13 @@ const actionOptions = [
   "FILE_UPLOAD",
   "FILE_DELETE",
   "BOOK_CREATE_PENDING",
-  "BOOK_CREATE_CONFIRMED",
-  "BOOK_CONFIRMED",
+  "BOOK_CREATE_COMPLETED",
+  "BOOK_COMPLETED",
   "BOOK_UPDATE",
   "BOOK_UPDATE_SEATS",
-  "BOOK_CANCEL",
-  "BOOK_CANCEL_PENDING",
-  "BOOK_CANCEL_CONFIRMED",
+  "BOOK_EXPIRE",
+  "BOOK_EXPIRE_PENDING",
+  "BOOK_EXPIRE_COMPLETED",
   "BOOK_RESTORE",
   "BOOK_DELETE",
   "BOOK_FORCE_DELETE",
@@ -442,13 +442,13 @@ const getActionIcon = (action) => {
 
     // --- Booking Lifecycle ---
     BOOK_CREATE_PENDING: Clock,
-    BOOK_CREATE_CONFIRMED: TicketCheck,
-    BOOK_CONFIRMED: TicketCheck,
+    BOOK_CREATE_COMPLETED: TicketCheck,
+    BOOK_COMPLETED: TicketCheck,
     BOOK_UPDATE: CalendarDays,
     BOOK_UPDATE_SEATS: Armchair,
-    BOOK_CANCEL: XCircle,
-    BOOK_CANCEL_PENDING: Clock,
-    BOOK_CANCEL_CONFIRMED: XCircle,
+    BOOK_EXPIRE: XCircle,
+    BOOK_EXPIRE_PENDING: Clock,
+    BOOK_EXPIRE_COMPLETED: XCircle,
     BOOK_RESTORE: RotateCcw,
     BOOK_DELETE: Trash2,
     BOOK_FORCE_DELETE: ShieldAlert,
@@ -490,7 +490,7 @@ const getActionClass = (action) => {
   if (action?.includes("DELETE") || action?.includes("FORCE"))
     return "indicator-danger";
   if (
-    action?.includes("CANCEL") ||
+    action?.includes("EXPIRE") ||
     action?.includes("EXPIRED") ||
     action?.includes("PASSWORD_RESET_REQUEST")
   )

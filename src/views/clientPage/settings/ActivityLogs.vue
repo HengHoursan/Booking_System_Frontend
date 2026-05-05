@@ -57,9 +57,11 @@ const getActionIcon = (action) => {
     case "LOGOUT":
       return LogOut;
     case "BOOK_CREATE_PENDING":
-    case "BOOK_CREATE_CONFIRMED":
+    case "BOOK_CREATE_COMPLETED":
       return Ticket;
-    case "BOOK_CANCEL":
+    case "BOOK_EXPIRE":
+    case "BOOK_EXPIRE_PENDING":
+    case "BOOK_EXPIRE_COMPLETED":
     case "BOOK_EXPIRED":
       return XOctagon;
     case "ACCOUNT_DEACTIVATED":
@@ -75,9 +77,11 @@ const getActionColor = (action) => {
       return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
     case "LOGOUT":
       return "text-amber-400 bg-amber-500/10 border-amber-500/20";
-    case "BOOK_CREATE_CONFIRMED":
+    case "BOOK_CREATE_COMPLETED":
       return "text-sky-400 bg-sky-500/10 border-sky-500/20";
-    case "BOOK_CANCEL":
+    case "BOOK_EXPIRE":
+    case "BOOK_EXPIRE_PENDING":
+    case "BOOK_EXPIRE_COMPLETED":
     case "BOOK_EXPIRED":
     case "ACCOUNT_DEACTIVATED":
       return "text-red-400 bg-red-500/10 border-red-500/20";

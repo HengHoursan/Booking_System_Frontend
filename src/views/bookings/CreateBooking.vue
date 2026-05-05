@@ -278,9 +278,9 @@ const submitBooking = async () => {
         bakongPaymentData.value = paymentResponse.data.payment;
         showBakongDialog.value = true;
       } else {
-        // Payment initiation failed - cancel the booking
+        // Payment initiation failed - expire the booking
         if (currentBookingId.value) {
-          await bookingService.cancelBooking(currentBookingId.value);
+          await bookingService.expireBooking(currentBookingId.value);
         }
         ElMessage.error(
           paymentResponse.message || t("payments.initiateFailed"),
@@ -321,17 +321,17 @@ const onPaymentDialogClose = async (paid) => {
     appStore.triggerRefresh();
     router.push(getAdminPath("/bookings"));
   } else {
-    // If not paid, cancel the booking to release the seats
-    const bookingIdToCancel = currentBookingId.value;
+    // If not paid, expire the booking to release the seats
+    const bookingIdToExpire = currentBookingId.value;
     currentBookingId.value = null; // Clear immediately to prevent re-use
     bakongPaymentData.value = null;
 
-    if (bookingIdToCancel) {
+    if (bookingIdToExpire) {
       try {
-        await bookingService.cancelBooking(bookingIdToCancel);
+        await bookingService.expireBooking(bookingIdToExpire);
         ElMessage.warning(t("payments.paymentFailed"));
       } catch (error) {
-        console.error("Failed to cancel unpaid booking:", error);
+        console.error("Failed to expire unpaid booking:", error);
       }
     }
     appStore.triggerRefresh();

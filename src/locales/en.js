@@ -50,13 +50,19 @@ export default {
     paymentId: "Payment ID",
     paymentInfo: "Payment Information",
     notes: "Notes",
-    confirmed: "Confirmed",
+    confirmed: "Completed",
     pending: "Pending",
-    cancelled: "Cancelled",
+    expired: "Expired",
     completed: "Completed",
     paid: "Paid",
     unpaid: "Unpaid",
     refunded: "Refunded",
+    cash: "Cash",
+    bakong: "Bakong",
+    card: "Card",
+    "mobile banking": "Mobile Banking",
+    "bank transfer": "Bank Transfer",
+    payatcinema: "Pay at Cinema",
     filterByStatus: "Filter by Booking Status",
     filterByPayment: "Filter by Payment Status",
     sortOrder: "Sort Order",
@@ -102,9 +108,9 @@ export default {
     samePriceError: "You can only select seats with the same price: ${price}",
     samePriceRestrictionInfo:
       "You can only change to seats with the same price ({price}) as your current booking.",
-    confirmedNav: "Confirmed",
+    confirmedNav: "Completed",
     pendingNav: "Pending",
-    cancelledNav: "Cancelled",
+    expiredNav: "Expired",
     completedNav: "Completed",
     refundedNav: "Refunded",
     paidNav: "Paid",
@@ -162,9 +168,9 @@ export default {
   },
   notifications_i18n: {
     booking_created: {
-      title: "Booking Confirmed",
+      title: "Booking Completed",
       message:
-        'Your booking {ref} for "{movie}" has been confirmed.\n\nSeats: {seats}',
+        'Your booking {ref} for "{movie}" has been completed.\n\nSeats: {seats}',
     },
     admin_booking_created: {
       title: "New Booking",
@@ -172,13 +178,13 @@ export default {
         'New booking {ref} for "{movie}" by {customer}.\n\nSeats: {seats}',
     },
     booking_confirmed: {
-      title: "Payment Confirmed",
+      title: "Payment Completed",
       message:
-        'Payment received! Your tickets for "{movie}" are confirmed.\n\nReference: {ref}\nSeats: {seats}\n\nShow this code at the counter or use it to enter.',
+        'Payment received! Your tickets for "{movie}" are completed.\n\nReference: {ref}\nSeats: {seats}\n\nShow this code at the counter or use it to enter.',
     },
-    booking_cancelled: {
-      title: "Booking Cancelled",
-      message: "Your booking {ref} has been cancelled.",
+    booking_expired: {
+      title: "Booking Expired",
+      message: "Your booking {ref} has expired.",
     },
     booking_updated: {
       title: "Booking Updated",
@@ -190,9 +196,9 @@ export default {
       message: "{promoTitle} (Code: {code})",
     },
     pay_at_cinema: {
-      title: "Booking Confirmed",
+      title: "Booking Completed",
       message:
-        'Booking {ref} confirmed for "{movie}".\n\n📌 Important: Please arrive at the cinema at least 30 minutes before the show starts to complete your payment and collect your tickets.\n\nSeats: {seats}',
+        'Booking {ref} completed for "{movie}".\n\n📌 Important: Please arrive at the cinema at least 30 minutes before the show starts to collect your tickets.\n\nSeats: {seats}',
     },
     pending_payment: {
       title: "Pending Payment",
@@ -308,8 +314,8 @@ export default {
       performed: "performed",
       // Action labels
       BOOK_CREATED: "created a booking",
-      BOOK_CONFIRMED: "confirmed a booking",
-      BOOK_CANCELLED: "cancelled a booking",
+      BOOK_COMPLETED: "completed a booking",
+      BOOK_EXPIRE: "expired a booking",
       BOOK_UPDATED: "updated a booking",
       BOOK_DELETED: "deleted a booking",
       USER_CREATED: "created a user",
@@ -791,7 +797,7 @@ export default {
     statuses: {
       scheduled: "Scheduled",
       completed: "Completed",
-      cancelled: "Cancelled",
+      expired: "Expired",
     },
     createSingle: "Create Single",
     createMultiple: "Create Multiple",
@@ -925,6 +931,12 @@ export default {
     failedToLoadRolePermissions: "Failed to load role permissions",
     filterByModule: "Filter by module",
     searchPermissions: "Search permissions...",
+    createSuccess: "Permission created successfully",
+    createFailed: "Failed to create permission",
+    roleCreateSuccess: "Role created successfully",
+    roleCreateFailed: "Failed to create role",
+    validationError: "Display name, name and module are required",
+    roleValidationError: "Display name and name are required",
   },
 
   // Settings (Updated for profile page)
@@ -1093,12 +1105,12 @@ export default {
       FILE_UPLOAD: "Uploaded File",
       FILE_DELETE: "Deleted File",
       BOOK_CREATE_PENDING: "Created Booking (Pending)",
-      BOOK_CREATE_CONFIRMED: "Created Booking (Confirmed)",
-      BOOK_CONFIRMED: "Booking Confirmed",
+      BOOK_CREATE_COMPLETED: "Created Booking (Completed)",
+      BOOK_COMPLETED: "Booking Completed",
       BOOK_UPDATE: "Updated Booking",
-      BOOK_CANCEL: "Cancelled Booking",
-      BOOK_CANCEL_PENDING: "Cancelled Booking (Pending)",
-      BOOK_CANCEL_CONFIRMED: "Cancelled Booking (Confirmed)",
+      BOOK_EXPIRE: "Expired Booking",
+      BOOK_EXPIRE_PENDING: "Booking Expire Pending",
+      BOOK_EXPIRE_COMPLETED: "Booking Expire Completed",
       BOOK_RESTORE: "Restored Booking",
       BOOK_DELETE: "Deleted Booking",
       BOOK_FORCE_DELETE: "Force Deleted Booking",
@@ -1384,13 +1396,12 @@ export default {
     totalRevenueGenerated: "Total Revenue Generated",
     avgBookingValue: "Avg Booking Value",
     completionRate: "Completion Rate",
-    cancellationRate: "Cancellation Rate",
+    expirationRate: "Expiration Rate",
     totalSeatsSold: "Total Seats Sold",
-    confirmedBookings: "Confirmed Bookings",
     completedBookings: "Completed Bookings",
-    cancelledBookings: "Cancelled Bookings",
+    expiredBookings: "Expired Bookings",
     staffPerformanceNote:
-      "This report tracks staff performance metrics including bookings processed, revenue generated, completion rates, and cancellation rates. Use this data to identify top performers and areas for improvement.",
+      "This report tracks staff performance metrics including bookings processed, revenue generated, completion rates, and expiration rates. Use this data to identify top performers and areas for improvement.",
     inventorySeatManagement: "Inventory & Seat Management",
     inventorySeatManagementDesc:
       "Analyze seat availability, occupancy rates, and seat type distribution.",
@@ -1736,13 +1747,5 @@ export default {
       deleteTitle: "Confirm Delete",
       restoreTitle: "Confirm Restore",
     },
-  },
-
-  // System Management
-  system: {
-    permissions: "System Permissions",
-    permissionsDesc: "Manage system access permissions",
-    rolePermissions: "Role Permissions",
-    rolePermissionsDesc: "Assign permissions to roles",
   },
 };

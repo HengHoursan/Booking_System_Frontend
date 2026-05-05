@@ -143,12 +143,12 @@ export const bookingService = {
   },
 
   /**
-   * Cancel a booking (soft delete).
+   * Expire a booking (soft delete).
    * @param {string} id - The booking ID.
    * @returns {Promise<object>}
    */
-  async cancelBooking(id, config = {}) {
-    const response = await api.patch(`/bookings/${id}/cancel`, {}, config);
+  async expireBooking(id, config = {}) {
+    const response = await api.patch(`/bookings/${id}/expire`, {}, config);
     return response.data;
   },
 
@@ -169,10 +169,9 @@ export const bookingService = {
 
   // Constants for statuses
   BOOKING_STATUSES: [
-    { value: "Confirmed", label: "Confirmed", type: "warning" }, // Changed color to type
-    { value: "Completed", label: "Completed", type: "success" }, // Changed color to type
-    { value: "Cancelled", label: "Cancelled", type: "danger" }, // Changed color to type
-    { value: "Pending", label: "Pending", type: "info" }, // Changed color to type
+    { value: "Completed", label: "Completed", type: "success" },
+    { value: "Pending", label: "Pending", type: "info" },
+    { value: "Expired", label: "Expired", type: "danger" },
   ],
 
   PAYMENT_STATUSES: [
