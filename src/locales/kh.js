@@ -1008,12 +1008,14 @@ export default {
   activity: {
     login: "ចូលគណនី",
     logout: "ចេញពីគណនី",
-    book_create_pending: "បង្កើតការកក់ (រង់ចាំ)",
+    book_create_pending: "ការកក់មិនទាន់បង់ប្រាក់",
+    book_create_completed: "ការកក់បានជោគជ័យ",
     book_create_confirmed: "បង្កើតការកក់ (ជោគជ័យ)",
     book_cancel: "បោះបង់ការកក់",
     book_expired: "ការកក់ផុតកំណត់",
     account_deactivated: "គណនីត្រូវបានបិទ",
     auth_fail: "ការចូលប្រើបរាជ័យ",
+    payment_completed: "ការបង់ប្រាក់បានជោគជ័យ",
   },
 
   activity_logs: {
@@ -1576,6 +1578,14 @@ export default {
         'ដោយចុចលើពាក្យ "បញ្ចប់ការកក់" អ្នកយល់ព្រមតាមលក្ខខណ្ឌរបស់យើង។ សំបុត្រអេឡិចត្រូនិកនឹងត្រូវបានចេញជូនភ្លាមៗបន្ទាប់ពីបង់ប្រាក់រួច។',
       completeBooking: "បញ្ចប់ការកក់",
       processing: "កំពុងដំណើរការ...",
+    },
+    phoneNumberDialog: {
+      title: "ត្រូវការលេខទូរស័ព្ទ",
+      message: "សូមផ្តល់លេខទូរស័ព្ទរបស់អ្នកដើម្បីបន្តការកក់។ នេះជួយយើងក្នុងការទាក់ទងអ្នកប្រសិនបើចាំបាច់។",
+      placeholder: "ឧទាហរណ៍៖ 012 345 678",
+      save: "រក្សាទុក និងបន្ត",
+      cancel: "បោះបង់",
+      invalidPhone: "សូមបញ្ចូលលេខទូរស័ព្ទឱ្យបានត្រឹមត្រូវ",
     },
     confirmation: {
       title: "ការកក់ត្រូវបានបញ្ជាក់!",

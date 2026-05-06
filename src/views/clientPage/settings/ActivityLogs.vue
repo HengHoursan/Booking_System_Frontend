@@ -139,10 +139,10 @@ const getActionLabel = (action) => {
       </button>
       <div>
         <h1 class="text-lg font-bold leading-none text-slate-900 dark:text-white">
-          {{ t("settings.privacySecurity") }}
+          {{ t("activity_logs.title") }}
         </h1>
         <p class="text-xs text-slate-400 dark:text-neutral-500 mt-1.5">
-          {{ t("activity_logs.title") }}
+          {{ t("activity_logs.titleDesc") }}
         </p>
       </div>
     </header>

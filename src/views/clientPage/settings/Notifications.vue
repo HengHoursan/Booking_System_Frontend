@@ -121,7 +121,10 @@ const deleteAllNotifications = async () => {
             @click="router.back()"
             class="w-9 h-9 rounded-xl flex items-center justify-center bg-white dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-white/[0.08] cursor-pointer"
           >
-            <ArrowLeft :size="18" class="text-slate-500 dark:text-neutral-400" />
+            <ArrowLeft
+              :size="18"
+              class="text-slate-500 dark:text-neutral-400"
+            />
           </button>
           <h1 class="text-sm font-bold">{{ t("settings.notifications") }}</h1>
         </div>
@@ -169,7 +172,9 @@ const deleteAllNotifications = async () => {
                   >
                     {{ getLocalizedTitle(item) }}
                   </h3>
-                  <span class="text-[10px] text-slate-400 dark:text-neutral-500 mt-0.5 block">
+                  <span
+                    class="text-[10px] text-slate-400 dark:text-neutral-500 mt-0.5 block"
+                  >
                     {{ getRelativeTime(item.createdAt) }}
                   </span>
                 </div>
@@ -214,7 +219,9 @@ const deleteAllNotifications = async () => {
             <Bell :size="20" />
           </div>
           <div class="flex-1 min-w-0">
-            <h3 class="text-base font-bold text-slate-900 dark:text-white leading-tight">
+            <h3
+              class="text-base font-bold text-slate-900 dark:text-white leading-tight"
+            >
               {{ getLocalizedTitle(selectedNotification) }}
             </h3>
             <p class="text-[11px] text-slate-400 dark:text-neutral-500 mt-0.5">

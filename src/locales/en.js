@@ -1017,12 +1017,14 @@ export default {
   activity: {
     login: "Login",
     logout: "Logout",
-    book_create_pending: "Create Booking (Pending)",
+    book_create_pending: "Booking Pending",
+    book_create_completed: "Booking Confirmed",
     book_create_confirmed: "Create Booking (Confirmed)",
     book_cancel: "Cancel Booking",
     book_expired: "Booking Expired",
     account_deactivated: "Account Deactivated",
     auth_fail: "Authentication Failed",
+    payment_completed: "Payment Completed",
   },
 
   activity_logs: {
@@ -1575,6 +1577,14 @@ export default {
         'By clicking "Complete Booking", you agree to our terms and conditions. Electronic tickets will be issued instantly after payment.',
       completeBooking: "Complete Booking",
       processing: "Processing...",
+    },
+    phoneNumberDialog: {
+      title: "Phone Number Required",
+      message: "Please provide your phone number to continue with the booking. This helps us contact you if needed.",
+      placeholder: "e.g., 012 345 678",
+      save: "Save & Continue",
+      cancel: "Cancel",
+      invalidPhone: "Please enter a valid phone number",
     },
     confirmation: {
       title: "Booking Confirmed!",

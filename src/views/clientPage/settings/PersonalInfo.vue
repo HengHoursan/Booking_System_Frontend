@@ -13,7 +13,7 @@ import {
 } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 import api from "@/utils/api";
-import { toLocalPhone } from "@/utils/formatters";
+import { toLocalPhone, toInternationalPhone, formatDate } from "@/utils/formatters";
 
 import { useAuthStore } from "@/stores/auth";
 import { useUiStore } from "@/stores/uiStore";
@@ -25,19 +25,18 @@ const authStore = useAuthStore();
 const isLoading = ref(false);
 const isSaving = ref(false);
 const isEditing = ref(false);
-const isWebApp = ref(sessionStorage.getItem("isWebApp") === "true" || !!window.Telegram?.WebApp?.initData);
 const uiStore = useUiStore();
 
 const userProfile = computed(() => {
   const customerData = authStore.user || {};
   return {
     id: customerData.id,
-    name: customerData.name || "Customer",
+    name: customerData.name || t("settings.noneProvided"),
     phone: customerData.phone || "",
     username: customerData.username || "",
     createdAt: customerData.createdAt
-      ? new Date(customerData.createdAt).toLocaleDateString()
-      : "Unknown",
+      ? formatDate(customerData.createdAt)
+      : t("settings.noneProvided"),
   };
 });
 
@@ -68,25 +67,22 @@ const handleSave = async () => {
   try {
     isSaving.value = true;
     // Client-side phone validation
-    const phoneVal = editForm.value.phone.replace(/\s+/g, ""); // Remove spaces
+    const phoneVal = editForm.value.phone.replace(/\D/g, ""); // Remove non-digits
     if (!/^0\d{8,9}$/.test(phoneVal)) {
       uiStore.showToast(t("validation.phoneInvalid"), "warning");
       isSaving.value = false;
       return;
     }
 
-    const res = await api.put("/customer/auth/profile", {
-      phone: editForm.value.phone,
+    // Convert to international format for server
+    const internationalPhone = toInternationalPhone(editForm.value.phone);
+
+    await authStore.updateProfile({
+      phone: internationalPhone,
     });
 
-    if (res.data?.success) {
-      // Update local profile with potentially normalized phone from server
-      const updatedCustomer = res.data.data.customer;
-      userProfile.value.phone = updatedCustomer.phone;
-
-      isEditing.value = false;
-      uiStore.showToast(t("settings.updateSuccess"), "success");
-    }
+    isEditing.value = false;
+    uiStore.showToast(t("settings.updateSuccess"), "success");
   } catch (error) {
     console.error("Failed to update profile:", error);
     uiStore.showToast(
@@ -158,7 +154,7 @@ const handlePhoneInput = (e) => {
         <div v-else class="space-y-4">
           <!-- Name Section (Read Only) -->
           <div
-            class="rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] p-4 flex items-center gap-4 opacity-80 backdrop-blur-sm shadow-sm dark:shadow-none"
+            class="rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03] p-4 flex items-center gap-4 backdrop-blur-sm shadow-sm dark:shadow-none transition-all"
           >
             <div
               class="w-10 h-10 rounded-full bg-sky-500/10 flex items-center justify-center text-sky-400 flex-shrink-0"
@@ -177,10 +173,9 @@ const handlePhoneInput = (e) => {
             </div>
           </div>
 
-          <!-- Username Section (Telegram info - Read Only) -->
           <div
             v-if="userProfile.username"
-            class="rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] p-4 flex items-center gap-4 opacity-80 shadow-sm dark:shadow-none"
+            class="rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03] p-4 flex items-center gap-4 shadow-sm dark:shadow-none transition-all"
           >
             <div
               class="w-10 h-10 rounded-full bg-violet-500/10 flex items-center justify-center text-violet-400 flex-shrink-0"
@@ -200,10 +195,12 @@ const handlePhoneInput = (e) => {
           </div>
 
 
-          <!-- Phone Section (Editable) -->
-          <!-- <div
-            class="rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] p-4 flex items-center gap-4 group transition-colors shadow-sm dark:shadow-none"
-            :class="{ 'border-sky-500/30 bg-sky-500/[0.05] dark:bg-sky-500/[0.05]': isEditing }"
+          <div
+            class="rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03] p-4 flex items-center gap-4 group transition-colors shadow-sm dark:shadow-none"
+            :class="{
+              'border-sky-500/30 bg-sky-500/[0.05] dark:bg-sky-500/[0.08]':
+                isEditing,
+            }"
           >
             <div
               class="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 flex-shrink-0"
@@ -225,42 +222,20 @@ const handlePhoneInput = (e) => {
                 :placeholder="t('settings.phonePlaceholder')"
                 class="w-full bg-transparent border-none text-sm font-medium text-slate-900 dark:text-white p-0 focus:ring-0 placeholder-slate-400 dark:placeholder-neutral-600 outline-none"
               />
-              <p v-else class="text-sm font-medium text-slate-900 dark:text-white truncate">
+              <p
+                v-else
+                class="text-sm font-medium text-slate-900 dark:text-white truncate"
+              >
                 {{
                   toLocalPhone(userProfile.phone) || t("settings.noneProvided")
                 }}
               </p>
             </div>
-          </div> -->
+          </div>
 
-          <!-- Sharing Tip for Mini App -->
-          <!-- <div
-            v-if="isWebApp && !userProfile.phone"
-            class="rounded-xl bg-sky-500/10 border border-sky-500/20 p-3 flex gap-3"
-          >
-            <div class="text-sky-400 flex-shrink-0 mt-0.5">
-              <svg
-                class="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <p class="text-[11px] text-sky-200/70 leading-relaxed">
-              {{ t("settings.sharePhoneTip") }}
-            </p>
-          </div> -->
 
-          <!-- Member Since (Read Only) -->
           <div
-            class="rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] p-4 flex items-center gap-4 opacity-80 shadow-sm dark:shadow-none"
+            class="rounded-2xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03] p-4 flex items-center gap-4 shadow-sm dark:shadow-none transition-all"
           >
             <div
               class="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-400 flex-shrink-0"

@@ -19,6 +19,7 @@ import { useUiStore } from "@/stores/uiStore";
 import { bookingService } from "@/services/bookingService";
 import { paymentService } from "@/services/paymentService";
 import ClientBakongQR from "@/components/payments/ClientBakongQR.vue";
+import PhoneNumberDialog from "@/components/common/PhoneNumberDialog.vue";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -56,6 +57,24 @@ const totalPrice = computed(() => bookingStore.totalPrice);
 const authStore = useAuthStore();
 const uiStore = useUiStore();
 
+const showPhoneDialog = ref(false);
+const isUpdatingPhone = ref(false);
+
+const savePhoneNumber = async (phone) => {
+  isUpdatingPhone.value = true;
+  try {
+    await authStore.updateProfile({ phone });
+    showPhoneDialog.value = false;
+    // After saving, continue with booking
+    handleCompleteBooking();
+  } catch (error) {
+    console.error("Failed to update phone number:", error);
+    uiStore.showToast(t("profile.updateFailed"), "error");
+  } finally {
+    isUpdatingPhone.value = false;
+  }
+};
+
 const handleCompleteBooking = async () => {
   if (isProcessing.value) return;
   if (
@@ -63,6 +82,12 @@ const handleCompleteBooking = async () => {
     bookingStore.selectedSeats.length === 0
   ) {
     uiStore.showToast(t("messages.error"), "error");
+    return;
+  }
+
+  // Check if user has phone number
+  if (!authStore.user?.phone) {
+    showPhoneDialog.value = true;
     return;
   }
 
@@ -400,6 +425,13 @@ onMounted(() => {
         @expired="handleQRExpired"
       />
     </div>
+
+    <!-- Phone Number Dialog -->
+    <PhoneNumberDialog
+      v-model:show="showPhoneDialog"
+      :is-updating="isUpdatingPhone"
+      @save="savePhoneNumber"
+    />
   </div>
 </template>
 
