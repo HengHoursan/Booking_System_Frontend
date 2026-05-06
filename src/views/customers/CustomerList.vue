@@ -99,60 +99,68 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('actions.title')" width="220">
+        <el-table-column
+          :label="$t('actions.title')"
+          fixed="right"
+          width="100"
+        >
           <template #default="{ row }">
-            <el-button
-              v-permission="'customers.view'"
-              type="info"
-              size="small"
-              link
-              @click="viewCustomer(row.id)"
-              :disabled="!!row.deleted_at"
+            <el-dropdown
+              trigger="click"
+              @command="(command) => handleCommand(command, row)"
             >
-              {{ $t("actions.view") }}
-            </el-button>
-            <el-button
-              v-permission="'customers.edit'"
-              type="primary"
-              size="small"
-              link
-              @click="editCustomer(row.id)"
-              :disabled="!!row.deleted_at"
-            >
-              {{ $t("actions.edit") }}
-            </el-button>
-            <el-button
-              v-if="!row.deleted_at"
-              v-permission="'customers.delete'"
-              type="danger"
-              size="small"
-              link
-              @click="deleteCustomer(row.id)"
-            >
-              {{ $t("actions.delete") }}
-            </el-button>
-            <el-button
-              v-else
-              v-permission="'customers.edit'"
-              type="success"
-              size="small"
-              link
-              @click="restoreCustomer(row.id)"
-            >
-              {{ $t("actions.restore") }}
-            </el-button>
-            <el-button
-              v-if="!row.deleted_at"
-              v-permission="'customers.edit'"
-              :type="row.isActive ? 'warning' : 'success'"
-              size="small"
-              link
-              @click="toggleStatus(row)"
-            >
-              {{
-                row.isActive ? $t("customers.inactive") : $t("customers.active")
-              }}
-            </el-button>
+              <el-button size="small" :icon="MoreFilled" circle @click.stop />
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item
+                    v-if="canViewCustomers"
+                    command="view"
+                    class="text-info"
+                    :disabled="!!row.deleted_at"
+                  >
+                    <el-icon><View /></el-icon>
+                    {{ $t("actions.view") }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-if="canEditCustomers"
+                    command="edit"
+                    class="text-primary"
+                    :disabled="!!row.deleted_at"
+                  >
+                    <el-icon><Edit /></el-icon>
+                    {{ $t("actions.edit") }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-if="canDeleteCustomers && !row.deleted_at"
+                    command="delete"
+                    class="text-danger"
+                  >
+                    <el-icon><Delete /></el-icon>
+                    {{ $t("actions.delete") }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-if="canEditCustomers && row.deleted_at"
+                    command="restore"
+                    class="text-success"
+                  >
+                    <el-icon><RefreshLeft /></el-icon>
+                    {{ $t("actions.restore") }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-if="canEditCustomers && !row.deleted_at"
+                    command="toggleStatus"
+                    :class="row.isActive ? 'text-warning' : 'text-success'"
+                  >
+                    <el-icon><SwitchButton /></el-icon>
+                    {{
+                      row.isActive
+                        ? $t("customers.inactive")
+                        : $t("customers.active")
+                    }}
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -180,7 +188,7 @@ import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import { customerService } from "@/services/customerService";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { Plus, Search } from "@element-plus/icons-vue";
+import { Plus, Search, MoreFilled, View, Edit, Delete, RefreshLeft, SwitchButton } from "@element-plus/icons-vue";
 import { useI18n } from "vue-i18n";
 import { debounce } from "lodash-es";
 import { toLocalPhone } from "@/utils/formatters";
@@ -370,6 +378,26 @@ const restoreCustomer = async (id) => {
   }
 };
 
+const handleCommand = (command, row) => {
+  switch (command) {
+    case "view":
+      viewCustomer(row.id);
+      break;
+    case "edit":
+      editCustomer(row.id);
+      break;
+    case "delete":
+      deleteCustomer(row.id);
+      break;
+    case "restore":
+      restoreCustomer(row.id);
+      break;
+    case "toggleStatus":
+      toggleStatus(row);
+      break;
+  }
+};
+
 const getCustomerTypeTag = (type) => {
   switch (type) {
     case "member":
@@ -421,5 +449,21 @@ onMounted(() => {
   margin-left: auto;
   font-size: 14px;
   color: var(--el-text-color-regular);
+}
+
+.text-info {
+  color: var(--el-color-info);
+}
+.text-primary {
+  color: var(--el-color-primary);
+}
+.text-danger {
+  color: var(--el-color-danger);
+}
+.text-success {
+  color: var(--el-color-success);
+}
+.text-warning {
+  color: var(--el-color-warning);
 }
 </style>
