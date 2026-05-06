@@ -287,7 +287,7 @@ const stats = computed(() => [
   },
   {
     label: "totalRevenue",
-    value: totalRevenue.value,
+    value: totalRevenue.value.toFixed(2),
     icon: Money,
     type: "revenue",
     isCurrency: true,
