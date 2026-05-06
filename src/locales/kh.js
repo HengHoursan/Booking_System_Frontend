@@ -150,6 +150,7 @@ export default {
     edit: "កែសម្រួល",
     activate: "ធ្វើឱ្យសកម្ម",
     deactivate: "ធ្វើឱ្យអសកម្ម",
+    selectAll: "ជ្រើសរើសទាំងអស់",
   },
   booking_actions: {
     delete_history: "លុបចេញពីប្រវត្តិ",
@@ -1151,6 +1152,7 @@ export default {
 
   // Common Actions
   actions: {
+    selectAll: "ជ្រើសរើសទាំងអស់",
     title: "សកម្មភាព",
     create: "បង្កើត",
     add: "បន្ថែម",

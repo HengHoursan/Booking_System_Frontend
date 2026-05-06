@@ -158,6 +158,7 @@ export default {
     download_qr: "Save QR Image",
     activate: "Activate",
     deactivate: "Deactivate",
+    selectAll: "Select All",
   },
   booking_actions: {
     delete_history: "Remove from History",
@@ -1154,6 +1155,7 @@ export default {
 
   // Common Actions
   actions: {
+    selectAll: "Select All",
     create: "Create",
     add: "Add",
     edit: "Edit",
