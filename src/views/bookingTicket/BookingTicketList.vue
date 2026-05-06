@@ -53,7 +53,7 @@
         />
         <el-table-column
           prop="customer_id.name"
-          :label="$t('bookingTickets.user')"
+          :label="$t('bookingTickets.customer')"
         />
         <el-table-column
           prop="booking_id.reference_code"

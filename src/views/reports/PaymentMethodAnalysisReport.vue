@@ -15,24 +15,24 @@
             </h2>
           </div>
           <div class="action-section">
-            <el-button 
-              type="primary" 
+            <el-button
+              type="primary"
               @click="handleExport('csv')"
               :icon="Download"
               class="export-btn"
             >
               CSV
             </el-button>
-            <el-button 
-              type="success" 
+            <el-button
+              type="success"
               @click="handleExport('excel')"
               :icon="Download"
               class="export-btn"
             >
               Excel
             </el-button>
-            <el-button 
-              type="danger" 
+            <el-button
+              type="danger"
               @click="handleExport('pdf')"
               :icon="DocumentCopy"
               class="export-btn"
@@ -66,35 +66,31 @@
       </div>
 
       <!-- Summary Cards -->
-      <div class="summary-cards mb-6">
-        <el-row :gutter="20">
-          <el-col :xs="24" :sm="12" :md="6">
-            <div class="summary-card">
-              <div class="card-label">{{ $t("reports.totalTransactions") }}</div>
-              <div class="card-value">{{ totalTransactions }}</div>
-            </div>
-          </el-col>
-          <el-col :xs="24" :sm="12" :md="6">
-            <div class="summary-card">
-              <div class="card-label">{{ $t("reports.totalRevenue") }}</div>
-              <div class="card-value text-green-600">
-                ${{ totalRevenue.toFixed(2) }}
-              </div>
-            </div>
-          </el-col>
-          <el-col :xs="24" :sm="12" :md="6">
-            <div class="summary-card">
-              <div class="card-label">{{ $t("reports.successfulTransactions") }}</div>
-              <div class="card-value text-blue-600">{{ totalSuccessful }}</div>
-            </div>
-          </el-col>
-          <el-col :xs="24" :sm="12" :md="6">
-            <div class="summary-card">
-              <div class="card-label">{{ $t("reports.failedTransactions") }}</div>
-              <div class="card-value text-red-600">{{ totalFailed }}</div>
-            </div>
-          </el-col>
-        </el-row>
+      <div class="summary-cards mb-8">
+        <div class="summary-card">
+          <div class="card-label">{{ $t("reports.totalTransactions") }}</div>
+          <div class="card-value">{{ totalTransactions }}</div>
+        </div>
+        <div class="summary-card">
+          <div class="card-label">{{ $t("reports.totalRevenue") }}</div>
+          <div class="card-value text-green-600">
+            ${{ totalRevenue.toFixed(2) }}
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="card-label">
+            {{ $t("reports.successfulTransactions") }}
+          </div>
+          <div class="card-value text-blue-600">{{ totalSuccessful }}</div>
+        </div>
+        <div class="summary-card">
+          <div class="card-label">{{ $t("reports.failedTransactions") }}</div>
+          <div class="card-value text-red-600">{{ totalFailed }}</div>
+        </div>
+        <div class="summary-card">
+          <div class="card-label">{{ $t("reports.expiredTransactions") }}</div>
+          <div class="card-value text-gray-500">{{ totalExpired }}</div>
+        </div>
       </div>
 
       <!-- Table -->
@@ -118,14 +114,14 @@
         <el-table-column
           prop="total_transactions"
           :label="$t('reports.totalTransactions')"
-          width="140"
+          width="180"
           align="center"
           sortable
         />
         <el-table-column
           prop="successful_transactions"
           :label="$t('reports.successful')"
-          width="120"
+          width="150"
           align="center"
           sortable
         >
@@ -138,7 +134,7 @@
         <el-table-column
           prop="failed_transactions"
           :label="$t('reports.failed')"
-          width="100"
+          width="140"
           align="center"
           sortable
         >
@@ -151,7 +147,7 @@
         <el-table-column
           prop="pending_transactions"
           :label="$t('reports.pending')"
-          width="100"
+          width="140"
           align="center"
           sortable
         >
@@ -162,9 +158,22 @@
           </template>
         </el-table-column>
         <el-table-column
+          prop="expired_transactions"
+          :label="$t('reports.expired')"
+          width="100"
+          align="center"
+          sortable
+        >
+          <template #default="{ row }">
+            <el-tag type="info" size="small">
+              {{ row.expired_transactions }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column
           prop="success_rate"
           :label="$t('reports.successRate')"
-          width="120"
+          width="150"
           align="center"
           sortable
         >
@@ -180,7 +189,7 @@
         <el-table-column
           prop="failed_rate"
           :label="$t('reports.failedRate')"
-          width="120"
+          width="140"
           align="center"
           sortable
         >
@@ -191,7 +200,7 @@
         <el-table-column
           prop="total_revenue"
           :label="$t('reports.revenue')"
-          width="150"
+          width="180"
           align="right"
           sortable
         >
@@ -204,7 +213,7 @@
         <el-table-column
           prop="revenue_contribution_percentage"
           :label="$t('reports.revenueContribution')"
-          width="140"
+          width="180"
           align="center"
           sortable
         >
@@ -214,13 +223,15 @@
               :color="getProgressColor(row.revenue_contribution_percentage)"
               :show-text="false"
             />
-            <span class="text-xs">{{ row.revenue_contribution_percentage }}%</span>
+            <span class="text-xs"
+              >{{ row.revenue_contribution_percentage }}%</span
+            >
           </template>
         </el-table-column>
         <el-table-column
           prop="avg_transaction_value"
           :label="$t('reports.avgTransactionValue')"
-          width="160"
+          width="200"
           align="right"
           sortable
         >
@@ -257,15 +268,19 @@
           </template>
         </el-table-column>
       </el-table>
-
-   
     </el-card>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed, watch } from "vue";
-import { ArrowLeft, Download, DocumentCopy, InfoFilled, Search } from "@element-plus/icons-vue";
+import {
+  ArrowLeft,
+  Download,
+  DocumentCopy,
+  InfoFilled,
+  Search,
+} from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import reportService from "@/services/reportService";
 import { exportToCSV, exportToExcel, printTable } from "@/utils/exportUtils";
@@ -286,7 +301,10 @@ const filters = reactive({
 
 // Computed properties for summary
 const totalTransactions = computed(() => {
-  return reportData.value.reduce((sum, item) => sum + item.total_transactions, 0);
+  return reportData.value.reduce(
+    (sum, item) => sum + item.total_transactions,
+    0,
+  );
 });
 
 const totalRevenue = computed(() => {
@@ -294,11 +312,24 @@ const totalRevenue = computed(() => {
 });
 
 const totalSuccessful = computed(() => {
-  return reportData.value.reduce((sum, item) => sum + item.successful_transactions, 0);
+  return reportData.value.reduce(
+    (sum, item) => sum + item.successful_transactions,
+    0,
+  );
 });
 
 const totalFailed = computed(() => {
-  return reportData.value.reduce((sum, item) => sum + item.failed_transactions, 0);
+  return reportData.value.reduce(
+    (sum, item) => sum + item.failed_transactions,
+    0,
+  );
+});
+
+const totalExpired = computed(() => {
+  return reportData.value.reduce(
+    (sum, item) => sum + item.expired_transactions,
+    0,
+  );
 });
 
 // Watch for dateRange change to update filters
@@ -315,7 +346,8 @@ watch(dateRange, (val) => {
 const loadData = async () => {
   loading.value = true;
   try {
-    const response = await reportService.getPaymentMethodAnalysisReport(filters);
+    const response =
+      await reportService.getPaymentMethodAnalysisReport(filters);
     reportData.value = response.data || [];
   } catch (error) {
     ElMessage.error(t("reports.failedToLoadData"));
@@ -348,12 +380,16 @@ const handleExport = (type) => {
     [t("reports.successful")]: item.successful_transactions,
     [t("reports.failed")]: item.failed_transactions,
     [t("reports.pending")]: item.pending_transactions,
+    [t("reports.expired")]: item.expired_transactions,
     [t("reports.successRate")]: `${item.success_rate}%`,
     [t("reports.failedRate")]: `${item.failed_rate}%`,
     [t("reports.revenue")]: item.total_revenue,
-    [t("reports.revenueContribution")]: `${item.revenue_contribution_percentage}%`,
+    [t("reports.revenueContribution")]:
+      `${item.revenue_contribution_percentage}%`,
     [t("reports.avgTransactionValue")]: item.avg_transaction_value,
-    [t("reports.firstTransactionDate")]: formatDate(item.first_transaction_date),
+    [t("reports.firstTransactionDate")]: formatDate(
+      item.first_transaction_date,
+    ),
     [t("reports.lastTransactionDate")]: formatDate(item.last_transaction_date),
   }));
 
@@ -366,8 +402,11 @@ const handleExport = (type) => {
   } else if (type === "excel") {
     exportToExcel(data, filename, {
       summary: [
-        { label: t("reports.totalRevenue") || "Total Revenue", value: totalRevenue.value }
-      ]
+        {
+          label: t("reports.totalRevenue") || "Total Revenue",
+          value: totalRevenue.value,
+        },
+      ],
     });
   } else if (type === "pdf") {
     const pdfData = reportData.value.map((item) => ({
@@ -376,6 +415,7 @@ const handleExport = (type) => {
       successful: item.successful_transactions,
       failed: item.failed_transactions,
       pending: item.pending_transactions,
+      expired: item.expired_transactions,
       successRate: `${item.success_rate}%`,
       failedRate: `${item.failed_rate}%`,
       revenue: item.total_revenue,
@@ -391,6 +431,7 @@ const handleExport = (type) => {
       { header: t("reports.successful"), dataKey: "successful" },
       { header: t("reports.failed"), dataKey: "failed" },
       { header: t("reports.pending"), dataKey: "pending" },
+      { header: t("reports.expired"), dataKey: "expired" },
       { header: t("reports.successRate"), dataKey: "successRate" },
       { header: t("reports.failedRate"), dataKey: "failedRate" },
       { header: t("reports.revenue"), dataKey: "revenue" },
@@ -401,8 +442,11 @@ const handleExport = (type) => {
     ];
     printTable(pdfData, columns, t("reports.paymentMethodAnalysis"), {
       summary: [
-        { label: t("reports.totalRevenue") || "Total Revenue", value: totalRevenue.value }
-      ]
+        {
+          label: t("reports.totalRevenue") || "Total Revenue",
+          value: totalRevenue.value,
+        },
+      ],
     });
   }
 };
@@ -411,7 +455,10 @@ onMounted(() => {
   appStore.setBreadcrumbs([
     { title: t("nav.dashboard"), path: "/admin/dashboard" },
     { title: t("nav.reportsNav"), path: "/admin/reports" },
-    { title: t("reports.paymentMethodAnalysis"), path: "/admin/reports/payment-methods" },
+    {
+      title: t("reports.paymentMethodAnalysis"),
+      path: "/admin/reports/payment-methods",
+    },
   ]);
   loadData();
 });
@@ -461,6 +508,31 @@ onMounted(() => {
   gap: 20px;
 }
 
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .summary-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
 .summary-card {
   background: var(--el-bg-color);
   color: var(--el-text-color-primary);
@@ -481,6 +553,19 @@ onMounted(() => {
 .card-value {
   font-size: 28px;
   font-weight: bold;
+}
+
+:deep(.el-card__header) {
+  padding: 20px 30px;
+}
+
+:deep(.el-table th.el-table__cell) {
+  padding: 12px 0;
+  background-color: var(--el-fill-color-light);
+}
+
+:deep(.el-table .cell) {
+  white-space: nowrap;
 }
 
 .info-section {

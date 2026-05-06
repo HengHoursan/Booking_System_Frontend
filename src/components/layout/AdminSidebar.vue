@@ -266,7 +266,7 @@
             </el-icon>
             <template #title>{{ $t("customers.allCustomers") }}</template>
           </el-menu-item>
-          <el-menu-item
+          <!-- <el-menu-item
             v-if="isSuperAdmin || canCreateCustomers"
             :index="pathPrefix + '/customers/create'"
           >
@@ -274,7 +274,7 @@
               <Plus />
             </el-icon>
             <template #title>{{ $t("customers.createCustomer") }}</template>
-          </el-menu-item>
+          </el-menu-item> -->
         </el-sub-menu>
 
         <!-- Reports -->

@@ -269,17 +269,18 @@ const seatLayout = computed(() => {
 
 const getSeatClass = (seat) => {
   const seatId = (seat._id || seat.id)?.toString();
+  const typeClass = `seat-type-${seat.seat_type || 'regular'}`;
   if (seat.status === "maintenance" || seat.status === "out_of_order")
-    return "unavailable";
-  if (bookedSeats.value.includes(seatId)) return "booked";
-  if (props.modelValue.has(seatId)) return "selected";
+    return `unavailable ${typeClass}`;
+  if (bookedSeats.value.includes(seatId)) return `booked ${typeClass}`;
+  if (props.modelValue.has(seatId)) return `selected ${typeClass}`;
   
   // If price restriction is enabled, mark seats with different prices as unavailable
   if (props.restrictToPrice !== null && seat.price !== props.restrictToPrice) {
-    return "price-restricted";
+    return `price-restricted ${typeClass}`;
   }
   
-  return "available";
+  return `available ${typeClass}`;
 };
 
 const seatTypes = computed(() => {
@@ -396,7 +397,7 @@ const toggleSeat = (seat) => {
 <style scoped>
 .select-seats-step {
   margin: 0 auto;
-  padding: 20px 40px;
+  padding: 10px 16px;
   max-width: 11000px;
   outline: 1px solid var(--el-border-color-lighter);
 }
@@ -406,7 +407,7 @@ const toggleSeat = (seat) => {
   flex-direction: column;
   align-items: center;
   background-color: var(--el-bg-color);
-  padding: 40px;
+  padding: 20px;
   border-radius: 8px;
   border: 1px solid var(--el-border-color-lighter);
 }
@@ -414,9 +415,9 @@ const toggleSeat = (seat) => {
 .screen-container {
   width: 100%;
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
   position: relative;
-  height: 50px; /* Made thinner */
+  height: 36px;
 }
 
 .screen-arc {
@@ -442,7 +443,7 @@ const toggleSeat = (seat) => {
 .seat-map {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
   width: 100%;
 }
 
@@ -450,15 +451,16 @@ const toggleSeat = (seat) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 12px;
 }
 
 .row-label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  width: 50px;
+  gap: 6px;
+  width: 40px;
   font-weight: bold;
+  font-size: 11px;
   color: var(--el-text-color-secondary);
 }
 
@@ -481,30 +483,30 @@ const toggleSeat = (seat) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 36px;
+  gap: 20px;
 }
 
 .seats-section {
   display: flex;
-  gap: 12px;
+  gap: 6px;
 }
 
 .seat {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 4px;
   cursor: pointer;
   user-select: none;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   font-weight: 600;
   position: relative;
 }
 
 .seat-number {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .seat.available {
@@ -545,13 +547,50 @@ const toggleSeat = (seat) => {
   opacity: 0.7;
 }
 
+/* Seat type colors for available seats */
+.seat.available.seat-type-regular {
+  background-color: #dbeafe;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+.seat.available.seat-type-regular:hover {
+  background-color: #bfdbfe;
+}
+
+.seat.available.seat-type-vip {
+  background-color: #f3e8ff;
+  color: #7c3aed;
+  border: 1px solid #e9d5ff;
+}
+.seat.available.seat-type-vip:hover {
+  background-color: #e9d5ff;
+}
+
+.seat.available.seat-type-couple {
+  background-color: #fce7f3;
+  color: #db2777;
+  border: 1px solid #fbcfe8;
+}
+.seat.available.seat-type-couple:hover {
+  background-color: #fbcfe8;
+}
+
+.seat.available.seat-type-queen {
+  background-color: #fef3c7;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+.seat.available.seat-type-queen:hover {
+  background-color: #fde68a;
+}
+
 .legend {
-  margin-top: 50px;
+  margin-top: 24px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 12px;
   width: 100%;
-  padding: 30px;
+  padding: 16px;
   background-color: var(--el-bg-color-overlay);
   border-top: 1px solid var(--el-border-color-lighter);
 }
@@ -560,7 +599,7 @@ const toggleSeat = (seat) => {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 24px;
+  gap: 16px;
 }
 
 .legend-divider {
@@ -574,14 +613,14 @@ const toggleSeat = (seat) => {
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 13px;
+  gap: 6px;
+  font-size: 11px;
   color: var(--el-text-color-primary);
 }
 
 .legend-item .seat {
-  width: 18px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   cursor: default;
   transform: scale(1);
   box-shadow: none;

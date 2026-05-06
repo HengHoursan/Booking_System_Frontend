@@ -30,91 +30,70 @@
       style="min-height: 200px"
     ></div>
     <div v-else class="showtime-list">
-      <div v-if="showtimeOptions.length > 0" class="showtime-grid">
+      <div v-if="showtimeOptions.length > 0" class="schedule-list">
         <div
-          v-for="showtime in showtimeOptions"
+          v-for="(showtime, index) in showtimeOptions"
           :key="showtime.id"
-          @click="selectShowtime(showtime)"
-          :class="[
-            'showtime-card',
-            { selected: modelValue?.id === showtime.id },
-          ]"
+          @click="!isFull(showtime) && selectShowtime(showtime)"
+          class="schedule-item animate-in"
+          :class="{ 
+            'is-active': modelValue?.id === showtime.id,
+            'is-disabled': isFull(showtime)
+          }"
+          :style="{ animationDelay: `${index * 50}ms` }"
         >
-          <div class="showtime-card-content-wrapper">
-            <!-- Poster Image -->
-            <div class="poster-section">
-              <el-image
-                :src="showtime.movie_poster"
-                :alt="showtime.movie_title"
-                class="poster-image"
-                fit="cover"
-              />
-              <!-- <div v-if="showtime.occupancy >= 0.9" class="selling-fast-badge">
-                {{ $t("bookings.sellingFast") }}
-              </div> -->
+          <!-- Time column -->
+          <div class="time-col">
+            <div class="time-start">{{ showtime.start_time }}</div>
+          </div>
+
+          <!-- Movie poster -->
+          <el-image
+            v-if="showtime.movie_poster"
+            :src="showtime.movie_poster"
+            fit="cover"
+            class="movie-thumb"
+          >
+            <template #error>
+              <div class="thumb-fallback">
+                <el-icon><Film /></el-icon>
+              </div>
+            </template>
+          </el-image>
+
+          <!-- Info -->
+          <div class="showtime-info">
+            <div class="movie-title" :title="showtime.movie_title">
+              {{ showtime.movie_title }}
             </div>
+            <div class="meta-row">
+              <el-icon class="meta-icon"><MapPin /></el-icon>
+              <span class="meta-text">{{ showtime.theater_name }} • {{ showtime.hall_name }}</span>
+            </div>
+          </div>
 
-            <!-- Details -->
-            <div class="details-section">
-              <div>
-                <div class="details-header">
-                  <h3 class="movie-title">
-                    {{ showtime.movie_title }}
-                  </h3>
-                </div>
-
-                <div class="showtime-meta-grid">
-                  <div class="showtime-meta-item">
-                    <MapPin class="meta-icon" />
-                    <span
-                      >{{ showtime.theater_name }} •
-                      {{ showtime.hall_name }}</span
-                    >
-                  </div>
-                  <div class="showtime-meta-item">
-                    <Calendar class="meta-icon" />
-                    <span>{{ showtime.show_date }}</span>
-                  </div>
-                  <div class="showtime-meta-item">
-                    <Clock class="meta-icon" />
-                    <span class="font-semibold">{{ showtime.start_time }}</span>
-                  </div>
-                  <div class="showtime-meta-item">
-                    <Ticket class="meta-icon" />
-                    <span
-                      >{{ showtime.bookedCount }} / {{ showtime.totalCount }}
-                      {{ $t("bookings.seats") }}</span
-                    >
-                  </div>
-                </div>
-              </div>
-
-              <!-- Progress Bar -->
-              <div class="occupancy-progress-container">
-                <div class="occupancy-labels">
-                  <span class="occupancy-text">{{
-                    $t("bookings.occupancy")
-                  }}</span>
-                  <span
-                    :class="[
-                      'occupancy-percentage',
-                      { 'high-occupancy': showtime.occupancy > 0.9 },
-                    ]"
-                  >
-                    {{ Math.round(showtime.occupancy * 100) }}%
-                    {{ $t("bookings.full") }}
-                  </span>
-                </div>
-                <div class="progress-bar-background">
-                  <div
-                    class="progress-bar-fill"
-                    :style="{
-                      width: `${showtime.occupancy * 100}%`,
-                      backgroundColor: getProgressBarColor(showtime.occupancy),
-                    }"
-                  ></div>
-                </div>
-              </div>
+          <!-- Occupancy column -->
+          <div class="occupancy-col">
+            <div class="occupancy-labels">
+              <span class="occupancy-text">
+                <el-icon style="vertical-align: text-bottom; margin-right: 4px;"><Ticket /></el-icon>
+                {{ showtime.bookedCount }} / {{ showtime.totalCount }} {{ $t("bookings.seats") }}
+              </span>
+              <span
+                class="occupancy-percentage"
+                :class="{ 'high-occupancy': showtime.occupancy > 0.9 }"
+              >
+                {{ Math.round(showtime.occupancy * 100) }}%
+              </span>
+            </div>
+            <div class="progress-bar-background">
+              <div
+                class="progress-bar-fill"
+                :style="{
+                  width: `${showtime.occupancy * 100}%`,
+                  backgroundColor: getProgressBarColor(showtime.occupancy),
+                }"
+              ></div>
             </div>
           </div>
         </div>
@@ -144,6 +123,7 @@
 import { ref, reactive, onMounted, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { ElMessage } from "element-plus";
+import { Film } from "@element-plus/icons-vue";
 import { Calendar, Clock, MapPin, Ticket, Search } from "lucide-vue-next";
 import { showtimeService } from "@/services/showtimeService";
 import { seatService } from "@/services/seatService";
@@ -252,6 +232,10 @@ const debouncedLoadShowtimes = () => {
   }, 300);
 };
 
+const isFull = (showtime) => {
+  return showtime.totalCount > 0 && showtime.bookedCount >= showtime.totalCount;
+};
+
 const selectShowtime = (showtime) => {
   if (props.modelValue?.id === showtime.id) {
     emit("update:modelValue", null);
@@ -292,150 +276,154 @@ onMounted(() => {
 <style scoped>
 .step-content {
   margin: 0px;
-  padding: 30px 40px;
-  outline: 1px solid var(--el-border-color-lighter);
+  padding: 20px 0;
 }
 
-/* Showtime List Styles */
+.filter-controls {
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.date-filter-buttons {
+  display: flex;
+}
+
+/* Schedule List Styles */
 .showtime-list {
   width: 100%;
 }
 
-.showtime-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-
-.showtime-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: 1rem;
-  border: 1px solid var(--el-border-color);
-  transition: all 0.3s ease;
-  cursor: pointer;
-  background-color: var(--el-bg-color);
-}
-
-.showtime-card:hover {
-  border-color: var(--el-color-primary-light-3);
-  background-color: var(--el-fill-color-light);
-}
-
-.showtime-card.selected {
-  border-color: var(--el-color-primary);
-  box-shadow: 0 0 0 1px var(--el-color-primary);
-}
-
-.showtime-card-content-wrapper {
+.schedule-list {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
-  padding: 0.75rem;
+  gap: 12px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 6px;
 }
 
-@media (min-width: 640px) {
-  .showtime-card-content-wrapper {
-    flex-direction: row;
-  }
-}
-
-.poster-section {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.poster-image {
-  width: 100%;
-  height: 10rem;
-  object-fit: cover;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-@media (min-width: 640px) {
-  .poster-image {
-    width: 7rem;
-    height: 9rem;
-  }
-}
-
-.selling-fast-badge {
-  position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  background-color: var(--el-color-danger);
-  color: white;
-  font-size: 10px;
-  font-weight: bold;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.details-section {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 2rem;
-}
-
-.details-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.movie-title {
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-bottom: 15px;
-  color: var(--el-text-color-primary);
-  transition: color 0.3s;
-}
-
-.showtime-card:hover .movie-title {
-  color: var(--el-color-primary);
-}
-
-.showtime-meta-grid {
-  margin-top: 0.5rem;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem 1rem;
-  font-size: 0.875rem;
-  color: var(--el-text-color-secondary);
-}
-
-@media (min-width: 640px) {
-  .showtime-meta-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.showtime-meta-item {
+.schedule-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: var(--el-fill-color-light);
+  border: 1px solid var(--el-border-color-lighter);
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.meta-icon {
-  width: 1rem;
-  height: 1rem;
-  color: var(--el-color-primary);
+.schedule-item:hover:not(.is-disabled) {
+  background: var(--el-fill-color);
+  border-color: var(--el-color-primary-light-5);
+  transform: translateX(4px);
+  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.12);
 }
 
-.font-semibold {
-  font-weight: 600;
-  color: var(--el-text-color-regular);
+.schedule-item.is-active {
+  background: var(--el-color-primary-light-9);
+  border-color: var(--el-color-primary);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
 }
 
-.occupancy-progress-container {
+/* Disabled/Full Opacity Styling (matches client page) */
+.schedule-item.is-disabled {
+  opacity: 0.45;
+  filter: grayscale(100%);
+  cursor: not-allowed;
+  border-color: var(--el-border-color-lighter);
+  background: var(--el-fill-color-lighter);
+}
+
+/* Time column */
+.time-col {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  align-items: center;
+  min-width: 46px;
+  flex-shrink: 0;
+}
+.time-start {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--el-color-primary);
+  background: var(--el-color-primary-light-9);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-family: "JetBrains Mono", monospace;
+}
+
+/* Movie thumbnail */
+.movie-thumb {
+  width: 48px;
+  height: 70px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--el-fill-color);
+}
+.thumb-fallback {
+  width: 48px;
+  height: 70px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--el-fill-color);
+  color: var(--el-text-color-secondary);
+  font-size: 24px;
+}
+
+/* Info */
+.showtime-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+.movie-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--el-text-color-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.meta-icon {
+  font-size: 14px;
+  color: var(--el-text-color-secondary);
+  flex-shrink: 0;
+  display: inline-flex;
+}
+.meta-text {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Occupancy */
+.occupancy-col {
+  width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .occupancy-labels {
@@ -443,8 +431,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: flex-end;
   font-size: 11px;
-  text-transform: uppercase;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .occupancy-text {
@@ -460,7 +447,7 @@ onMounted(() => {
 }
 
 .progress-bar-background {
-  height: 0.375rem;
+  height: 6px;
   width: 100%;
   background-color: var(--el-border-color-lighter);
   border-radius: 9999px;
@@ -473,6 +460,7 @@ onMounted(() => {
   border-radius: 9999px;
 }
 
+/* Placeholder */
 .no-showtimes-placeholder {
   display: flex;
   flex-direction: column;
@@ -480,7 +468,7 @@ onMounted(() => {
   justify-content: center;
   padding: 5rem 0;
   background-color: var(--el-fill-color-lighter);
-  border-radius: 1.5rem;
+  border-radius: 12px;
   border: 1px dashed var(--el-border-color);
   text-align: center;
 }
@@ -488,36 +476,52 @@ onMounted(() => {
 .placeholder-icon-container {
   background-color: var(--el-fill-color-light);
   padding: 1rem;
+  border-radius: 50%;
   margin-bottom: 1rem;
   color: var(--el-text-color-secondary);
 }
 
 .placeholder-title {
-  font-size: 1.25rem;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--el-text-color-primary);
 }
 
 .placeholder-subtitle {
   color: var(--el-text-color-secondary);
-  margin-top: 0.25rem;
+  margin-top: 4px;
+  font-size: 13px;
 }
 
 .clear-filters-button {
-  margin-top: 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
+  margin-top: 16px;
 }
-.filter-controls {
-  display: flex;
-  flex-grow: 1;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40px;
-  flex-wrap: wrap;
-  gap: 10px;
+
+/* Animation */
+.animate-in {
+  opacity: 0;
+  animation: slideIn 0.3s ease forwards;
 }
-.date-filter-buttons {
-  display: flex;
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom scrollbar */
+.schedule-list::-webkit-scrollbar {
+  width: 6px;
+}
+.schedule-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.schedule-list::-webkit-scrollbar-thumb {
+  background: var(--el-border-color);
+  border-radius: 3px;
 }
 </style>

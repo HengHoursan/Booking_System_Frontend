@@ -229,7 +229,7 @@
                     </el-icon>
                     {{ $t("actions.view") }}
                   </el-dropdown-item>
-                  <el-dropdown-item
+                  <!-- <el-dropdown-item
                     command="edit"
                     class="text-primary"
                   >
@@ -237,9 +237,9 @@
                       <Edit />
                     </el-icon>
                     {{ $t("actions.edit") }}
-                  </el-dropdown-item>
+                  </el-dropdown-item> -->
                   <el-dropdown-item
-                    v-if="hasPermission('bookings.delete')"
+                    v-if="hasPermission('bookings.delete') && row.booking_status !== 'Completed'"
                     command="delete"
                     class="text-danger"
                   >
@@ -402,7 +402,7 @@
     <el-dialog
       v-model="editSeatsDialogVisible"
       :title="$t('seats.editSeats')"
-      width="1000px"
+      width="680px"
       :close-on-click-modal="false"
       destroy-on-close
     >
@@ -729,6 +729,10 @@ const handleCommand = (command, row) => {
       openEditDialog(row);
       break;
     case "delete":
+      if (row.booking_status === "Completed") {
+        ElMessage.warning(t("bookings.cannotDeleteCompleted"));
+        return;
+      }
       deleteBooking(row.id);
       break;
     case "createPayment":

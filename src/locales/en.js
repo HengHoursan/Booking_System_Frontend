@@ -450,6 +450,7 @@ export default {
   },
   //Seat Managment
   seats: {
+    search: "Search Seat",
     indentifier: "Seat Indentifier",
     title: "Seat Management",
     theaterAndHall: "Theater & Hall",
@@ -1220,6 +1221,7 @@ export default {
       "You already have an active booking for this showtime. One customer can only book once per showtime.",
     pendingLimitReached:
       "You have too many pending 'Pay At Cinema' bookings. Please complete or cancel your existing bookings before making a new one.",
+    cannotDeleteCompleted: "Completed bookings cannot be deleted.",
     paymentInitiateFailed: "Failed to initiate payment. Please try again.",
     downloadSuccess: "Downloaded successfully",
     downloadFailed: "Failed to download",
@@ -1328,12 +1330,14 @@ export default {
     successful: "Successful",
     failed: "Failed",
     pending: "Pending",
+    expired: "Expired",
     successRate: "Success Rate",
     failedRate: "Failed Rate",
     revenueContribution: "Revenue Contribution",
     avgTransactionValue: "Avg Transaction Value",
     successfulTransactions: "Successful Transactions",
     failedTransactions: "Failed Transactions",
+    expiredTransactions: "Expired Transactions",
     paymentMethodAnalysisNote:
       "This report provides insights into payment method performance, including transaction success rates, revenue contribution by method, and average transaction values. Use this data to optimize payment processing and identify preferred payment methods.",
     search: "Search",

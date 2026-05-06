@@ -133,37 +133,38 @@
 
       <!-- Legend -->
       <div class="legend">
-        <div class="legend-row">
-          <span class="legend-item"
-            ><div class="seat seat-sm available"></div>
-            {{ $t("seats.statuses.available") }}</span
-          >
-          <span class="legend-item"
-            ><div class="seat seat-sm selected"></div>
-            {{ $t("seats.statuses.selected", "Selected") }}</span
-          >
-          <span class="legend-item"
-            ><div class="seat seat-sm booked"></div>
-            {{ $t("seats.statuses.booked") }}</span
-          >
-          <span class="legend-item"
-            ><div class="seat seat-sm locked-seat"></div>
-            {{ $t("seats.statuses.locked") }}</span
-          >
-          <span class="legend-item"
-            ><div class="seat seat-sm unavailable"></div>
-            {{ $t("seats.statuses.unavailable") }}</span
-          >
+        <!-- Row 1: Status -->
+        <div class="legend-row status-row">
+          <div class="legend-item">
+            <div class="seat seat-sm available"></div>
+            <span>{{ $t("seats.statuses.available") }}</span>
+          </div>
+          <div class="legend-item">
+            <div class="seat seat-sm selected"></div>
+            <span>{{ $t("seats.statuses.selected", "Selected") }}</span>
+          </div>
+          <div class="legend-item">
+            <div class="seat seat-sm booked"></div>
+            <span>{{ $t("seats.statuses.booked") }}</span>
+          </div>
+          <div class="legend-item">
+            <div class="seat seat-sm locked-seat"></div>
+            <span>{{ $t("seats.statuses.locked") }}</span>
+          </div>
+          <div class="legend-item">
+            <div class="seat seat-sm unavailable"></div>
+            <span>{{ $t("seats.statuses.unavailable") }}</span>
+          </div>
         </div>
-        <div class="legend-row" style="margin-top: 8px">
-          <span
-            v-for="(color, type) in seatTypeColors"
-            :key="type"
-            class="legend-item"
-          >
-            <span class="type-dot" :style="{ background: color }"></span>
-            {{ type }}
-          </span>
+
+        <div class="legend-divider"></div>
+
+        <!-- Row 2: Types with prices -->
+        <div class="legend-row types-row">
+          <div v-for="(cfg, key) in seatTypes" :key="key" class="legend-item">
+            <div class="seat-dot" :style="{ backgroundColor: cfg.color }"></div>
+            <span>{{ cfg.label }} ${{ cfg.price.toFixed(2) }}</span>
+          </div>
         </div>
       </div>
 
@@ -229,24 +230,54 @@ const selectedSeatIds = ref(new Set()); // seat IDs selected by user
 const loadingShowtimes = ref(false);
 const loadingSeats = ref(false);
 
-const seatTypeColors = {
+const typeColorMap = {
   regular: "#3b82f6",
   vip: "#a855f7",
   couple: "#ec4899",
   queen: "#f59e0b",
 };
 
+// Dynamic seat types derived from actual seat data (matches SelectSeatsStep)
+const seatTypes = computed(() => {
+  const types = {};
+  hallSeats.value.forEach((seat) => {
+    if (!types[seat.seat_type]) {
+      types[seat.seat_type] = {
+        label: seat.seat_type.charAt(0).toUpperCase() + seat.seat_type.slice(1),
+        color: typeColorMap[seat.seat_type] || "#3b82f6",
+        price: seat.price || 0,
+      };
+    }
+  });
+  return types;
+});
+
+// Keep seatTypeColors as a simple lookup for the row dots
+const seatTypeColors = computed(() => {
+  const colors = {};
+  Object.entries(seatTypes.value).forEach(([key, cfg]) => {
+    colors[key] = cfg.color;
+  });
+  return Object.keys(colors).length > 0 ? colors : typeColorMap;
+});
+
 // ─── Seat status helpers ──────────────────────────────────────────────────────
 const getSeatId = (seat) => (seat._id || seat.id)?.toString();
 
 const getSeatClass = (seat) => {
+  const typeClass = `seat-type-${seat.seat_type || 'regular'}`;
   if (seat.status === "maintenance" || seat.status === "out_of_order")
-    return "unavailable";
+    return `unavailable ${typeClass}`;
   const id = getSeatId(seat);
-  if (bookedSeatIds.value.includes(id)) return "booked";
-  if (lockedSeatIds.value.includes(id)) return "locked-seat";
-  if (selectedSeatIds.value.has(id)) return "selected";
-  return "available";
+  if (bookedSeatIds.value.includes(id)) return `booked ${typeClass}`;
+  if (lockedSeatIds.value.includes(id)) return `locked-seat ${typeClass}`;
+  if (selectedSeatIds.value.has(id)) return `selected ${typeClass}`;
+  return `available ${typeClass}`;
+};
+
+const getSeatTypeColor = (seat) => {
+  const color = seatTypes.value[seat.seat_type]?.color || typeColorMap[seat.seat_type] || '#3b82f6';
+  return color;
 };
 
 const getSeatNum = (seat) => {
@@ -538,23 +569,26 @@ onMounted(() => {
   color: var(--el-text-color-primary);
 }
 
+/* Seat layout wrapper — matches SelectSeatsStep container */
+.seat-layout-wrapper {
+  background-color: var(--el-bg-color);
+  padding: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--el-border-color-lighter);
+}
+
 /* Screen */
 .screen-wrap {
+  width: 100%;
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 40px;
   position: relative;
-  height: 36px;
+  height: 50px;
 }
 .screen-arc {
   width: 60%;
   height: 4px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    #6366f1 30%,
-    #8b5cf6 70%,
-    transparent
-  );
+  background: var(--el-border-color-light);
   border-radius: 4px;
   position: absolute;
   left: 20%;
@@ -562,11 +596,11 @@ onMounted(() => {
 }
 .screen-text {
   position: relative;
-  top: 14px;
+  top: 15px;
   color: var(--el-text-color-placeholder);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 3px;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
   text-transform: uppercase;
 }
 
@@ -574,7 +608,8 @@ onMounted(() => {
 .seat-map {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  width: 100%;
   overflow-x: auto;
   padding-bottom: 4px;
 }
@@ -582,14 +617,14 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 20px;
 }
 .row-label {
   display: flex;
   align-items: center;
-  gap: 6px;
-  width: 42px;
-  font-weight: 700;
+  gap: 8px;
+  width: 50px;
+  font-weight: bold;
   font-size: 12px;
   color: var(--el-text-color-secondary);
   flex-shrink: 0;
@@ -610,17 +645,17 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 28px;
+  gap: 36px;
 }
 .seats-section {
   display: flex;
-  gap: 8px;
+  gap: 12px;
 }
 
-/* Seats */
+/* Seats — matches SelectSeatsStep sizing */
 .seat {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -629,37 +664,43 @@ onMounted(() => {
   user-select: none;
   transition: all 0.2s ease;
   font-weight: 600;
+  position: relative;
 }
 .seat:hover {
   transform: translateY(-2px);
   filter: brightness(0.95);
 }
 .seat-number {
-  font-size: 11px;
+  font-size: 12px;
 }
 
-/* Status colours — exactly matches booking flow */
+/* Status colours — exactly matches SelectSeatsStep */
 .seat.available {
-  background: #e4e7ed;
-  color: #606266;
+  background-color: #e4e7ed;
+  color: #909399;
+}
+.seat.available:hover {
+  background-color: #dcdfe6;
+  transform: translateY(-2px);
 }
 .seat.booked {
-  background: #909399;
+  background-color: #909399;
   color: white;
-  opacity: 0.85;
+  opacity: 0.8;
+  cursor: not-allowed;
 }
 .seat.locked-seat {
   background: #fef3c7;
   border: 1.5px solid #fcd34d;
   color: #78350f;
+  cursor: not-allowed;
 }
 .seat.unavailable {
-  background: #fef0f0;
+  background-color: #fef0f0;
   border: 1px solid #fde2e2;
   color: #f56c6c;
   cursor: not-allowed;
 }
-
 .seat.selected {
   background-color: #409eff;
   color: white;
@@ -667,37 +708,94 @@ onMounted(() => {
   box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
 }
 
-/* Legend */
+/* Seat type colors for available seats */
+.seat.available.seat-type-regular {
+  background-color: #dbeafe;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+.seat.available.seat-type-regular:hover {
+  background-color: #bfdbfe;
+}
+
+.seat.available.seat-type-vip {
+  background-color: #f3e8ff;
+  color: #7c3aed;
+  border: 1px solid #e9d5ff;
+}
+.seat.available.seat-type-vip:hover {
+  background-color: #e9d5ff;
+}
+
+.seat.available.seat-type-couple {
+  background-color: #fce7f3;
+  color: #db2777;
+  border: 1px solid #fbcfe8;
+}
+.seat.available.seat-type-couple:hover {
+  background-color: #fbcfe8;
+}
+
+.seat.available.seat-type-queen {
+  background-color: #fef3c7;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+.seat.available.seat-type-queen:hover {
+  background-color: #fde68a;
+}
+
+/* Legend — matches SelectSeatsStep two-row layout */
 .legend {
-  margin-top:40px;
-  padding-top: 14px;
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  padding: 30px;
+  background-color: var(--el-bg-color-overlay);
   border-top: 1px solid var(--el-border-color-lighter);
 }
 .legend-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.legend-divider {
+  width: 60%;
+  height: 1px;
+  background-color: var(--el-border-color-lighter);
+  margin: 0 auto;
+  opacity: 0.5;
 }
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--el-text-color-secondary);
+  gap: 10px;
+  font-size: 13px;
+  color: var(--el-text-color-primary);
 }
-.seat.seat-sm {
-  width: 16px;
-  height: 18px;
+.legend-item .seat {
+  width: 18px;
+  height: 20px;
   cursor: default;
-  transform: none !important;
+  transform: scale(1);
+  box-shadow: none;
 }
-.seat.seat-sm .seat-number {
+.legend-item .seat:hover {
+  transform: none;
+}
+.legend-item .seat .seat-number {
   display: none;
 }
-.type-dot {
-  width: 8px;
-  height: 8px;
+.seat-sm {
+  cursor: default !important;
+  transform: none !important;
+}
+.seat-dot {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
 }
 
@@ -715,15 +813,10 @@ onMounted(() => {
   color: var(--el-color-primary);
 }
 .book-now-btn {
-  /* background: linear-gradient(135deg, #6366f1, #8b5cf6); */
   border: none;
   padding: 12px 28px;
   font-weight: 700;
   border-radius: 12px;
   transition: all 0.25s;
 }
-/* .book-now-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
-} */
 </style>

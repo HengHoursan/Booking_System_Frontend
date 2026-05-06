@@ -38,7 +38,10 @@
         v-for="(showtime, index) in showtimes"
         :key="showtime.id"
         class="schedule-item animate-in"
-        :class="{ 'is-active': interactiveMode && selectedId === showtime.id }"
+        :class="{ 
+          'is-active': interactiveMode && selectedId === showtime.id,
+          'is-disabled': showtime.status !== 'scheduled' || showtime.isFull
+        }"
         :style="{ animationDelay: `${index * 60}ms` }"
         @click="viewShowtime(showtime.id)"
       >
@@ -111,6 +114,8 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { Calendar, Film, Location, Clock } from "@element-plus/icons-vue";
 import { showtimeService } from "@/services/showtimeService";
+import { seatService } from "@/services/seatService";
+import { seatBookingService } from "@/services/seatBookingService";
 import dayjs from "dayjs";
 
 const props = defineProps({
@@ -185,7 +190,40 @@ const loadSchedule = async () => {
       sort_by: "start_time",
       sort_order: "asc",
     });
-    showtimes.value = response.data || [];
+
+    if (response.data && response.data.length > 0) {
+      // Fetch seat occupancy for each showtime to determine if it's fully booked
+      const showtimesWithOccupancy = await Promise.all(
+        response.data.map(async (showtime) => {
+          try {
+            const bookedSeatsResponse = await seatBookingService.getSeatBookings({
+              showtimeId: showtime.id,
+              status: "booked",
+              limit: 1,
+            });
+            const bookedCount = bookedSeatsResponse.total || 0;
+
+            const allSeatsResponse = await seatService.getSeatsByHall(
+              showtime.hall_id,
+              { per_page: 100 },
+            );
+            const totalCount = allSeatsResponse.data.length || 0;
+
+            const isFull = totalCount > 0 && bookedCount >= totalCount;
+            return {
+              ...showtime,
+              isFull
+            };
+          } catch (e) {
+            console.error(`Failed to load occupancy for showtime ${showtime.id}`, e);
+            return { ...showtime, isFull: false };
+          }
+        })
+      );
+      showtimes.value = showtimesWithOccupancy;
+    } else {
+      showtimes.value = [];
+    }
 
     // Core logic: Auto-select the first showtime in the list so the seat map isn't initially empty
     if (props.interactiveMode && showtimes.value.length > 0) {
@@ -253,7 +291,7 @@ onMounted(() => {
   cursor: pointer;
   transition: all 0.2s;
 }
-.schedule-item:hover {
+.schedule-item:hover:not(.is-disabled) {
   background: var(--el-fill-color);
   border-color: var(--el-color-primary-light-5);
   transform: translateX(4px);
@@ -263,6 +301,15 @@ onMounted(() => {
   background: var(--el-color-primary-light-9);
   border-color: var(--el-color-primary);
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+/* Disabled styling for completed/cancelled showtimes */
+.schedule-item.is-disabled {
+  opacity: 0.45;
+  filter: grayscale(100%);
+  cursor: not-allowed;
+  border-color: var(--el-border-color-lighter);
+  background: var(--el-fill-color-lighter);
 }
 
 /* Time column */
