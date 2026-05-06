@@ -42,28 +42,38 @@
 
         <!-- Navigation -->
         <div class="step-navigation">
-          <el-button v-if="activeStep > 0" @click="prevStep">
-            {{ $t("actions.previous") }}
-          </el-button>
+          <div class="button-group">
+            <el-button v-if="activeStep > 0" @click="prevStep">
+              {{ $t("actions.previous") }}
+            </el-button>
 
-          <el-button
-            v-if="activeStep < 2"
-            type="primary"
-            :disabled="!isStepValid"
-            @click="nextStep"
-          >
-            {{ $t("actions.next") }}
-          </el-button>
+            <el-button
+              v-if="activeStep < 2"
+              type="primary"
+              :disabled="!isStepValid"
+              @click="nextStep"
+            >
+              {{ $t("actions.next") }}
+            </el-button>
 
-          <el-button
-            v-if="activeStep === 2"
-            type="success"
-            :disabled="!isStepValid"
-            :loading="loading.booking"
-            @click="submitBooking"
-          >
-            {{ $t("bookings.createBooking") }}
-          </el-button>
+            <el-button
+              v-if="activeStep === 2"
+              type="success"
+              :disabled="!isStepValid"
+              :loading="loading.booking"
+              @click="submitBooking"
+            >
+              {{ $t("bookings.createBooking") }}
+            </el-button>
+          </div>
+          
+          <!-- Validation hint when button is disabled -->
+          <div v-if="activeStep === 2 && !isStepValid" class="validation-hint">
+            <el-text type="info" size="small">
+              <el-icon><InfoFilled /></el-icon>
+              {{ !bookingState.customerId ? $t('bookings.validation.customerRequired') : $t('bookings.validation.paymentMethodRequired') }}
+            </el-text>
+          </div>
         </div>
       </el-col>
 
@@ -99,6 +109,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { ElMessage } from "element-plus";
 import { ArrowLeft } from "lucide-vue-next";
+import { InfoFilled } from "@element-plus/icons-vue";
 import { useAppStore } from "@/stores/app";
 
 import { showtimeService } from "@/services/showtimeService";
@@ -170,7 +181,10 @@ const bookingSummary = computed(() => {
 const isStepValid = computed(() => {
   if (activeStep.value === 0) return !!bookingState.showtime;
   if (activeStep.value === 1) return bookingState.selectedSeats.size > 0;
-  if (activeStep.value === 2) return !!bookingState.paymentMethod;
+  if (activeStep.value === 2) {
+    // Payment step validation: must have payment method AND customer selection
+    return !!bookingState.paymentMethod && !!bookingState.customerId;
+  }
   return false;
 });
 
@@ -239,7 +253,19 @@ const handleEnterKey = (e) => {
 /* SUBMIT BOOKING FUNCTION */
 /* ===================== */
 const submitBooking = async () => {
-  if (!isStepValid.value) return;
+  if (!isStepValid.value) {
+    // Show specific validation messages
+    if (!bookingState.customerId) {
+      ElMessage.error(t("bookings.validation.customerRequired"));
+      return;
+    }
+    if (!bookingState.paymentMethod) {
+      ElMessage.error(t("bookings.validation.paymentMethodRequired"));
+      return;
+    }
+    return;
+  }
+  
   loading.booking = true;
 
   const bookingData = {
@@ -256,7 +282,18 @@ const submitBooking = async () => {
     const bookingResponse = await bookingService.createBooking(bookingData);
 
     if (!bookingResponse.success) {
-      ElMessage.error(bookingResponse.message || t("bookings.createFailed"));
+      // Handle specific validation errors from backend
+      const errorMessage = bookingResponse.message || t("bookings.createFailed");
+      
+      // Check for customer-related validation errors
+      if (errorMessage.includes("customerId") || errorMessage.includes("customer")) {
+        ElMessage.error(t("bookings.validation.customerRequired"));
+      } else if (errorMessage.includes("Validation failed")) {
+        ElMessage.error(t("bookings.validation.validationFailed"));
+      } else {
+        ElMessage.error(errorMessage);
+      }
+      
       loading.booking = false;
       return;
     }
@@ -292,7 +329,22 @@ const submitBooking = async () => {
       router.push(getAdminPath("/bookings"));
     }
   } catch (error) {
-    ElMessage.error(error.message || t("bookings.createFailed"));
+    // Handle network or other errors
+    let errorMessage = error.message || t("bookings.createFailed");
+    
+    // Check for specific validation errors in the error response
+    if (error.response?.data?.message) {
+      const backendMessage = error.response.data.message;
+      if (backendMessage.includes("customerId") || backendMessage.includes("customer")) {
+        errorMessage = t("bookings.validation.customerRequired");
+      } else if (backendMessage.includes("Validation failed")) {
+        errorMessage = t("bookings.validation.validationFailed");
+      } else {
+        errorMessage = backendMessage;
+      }
+    }
+    
+    ElMessage.error(errorMessage);
   } finally {
     loading.booking = false;
   }
@@ -424,5 +476,21 @@ onUnmounted(() => {
   padding: 20px;
   background-color: var(--el-bg-color);
   border-radius: 4px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.validation-hint {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 </style>

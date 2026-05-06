@@ -10,17 +10,22 @@
       </template>
 
       <el-form label-position="top">
-        <el-form-item :label="$t('customers.customer')">
+        <el-form-item 
+          :label="$t('customers.customer')"
+          required
+        >
           <el-select
-            :model-value="customerId"
+            :model-value="props.customerId"
             @update:modelValue="$emit('update:customerId', $event)"
             filterable
             remote
             :remote-method="loadCustomers"
             :loading="loading.customers"
             :placeholder="$t('customers.searchAndSelectCustomer')"
+            clearable
             style="width: 100%"
             size="large"
+            :class="{ 'is-error': !props.customerId }"
           >
             <template #prefix><User :size="18" /></template>
             <el-option
@@ -30,11 +35,23 @@
               :value="customer.id"
             />
           </el-select>
+          <div v-if="!props.customerId" class="validation-message">
+            <el-text type="danger" size="small">
+              <el-icon><WarningFilled /></el-icon>
+              {{ $t('bookings.validation.customerRequired') }}
+            </el-text>
+          </div>
+          <div v-else-if="isWalkinCustomer" class="helper-message">
+            <el-text type="info" size="small">
+              <el-icon><InfoFilled /></el-icon>
+              {{ $t('bookings.walkinCustomerSelected') }}
+            </el-text>
+          </div>
         </el-form-item>
 
         <el-form-item :label="$t('payments.paymentMethod')">
           <el-radio-group
-            :model-value="paymentMethod"
+            :model-value="props.paymentMethod"
             @update:modelValue="$emit('update:paymentMethod', $event)"
             size="large"
             style="width: 100%"
@@ -55,17 +72,17 @@
           </el-radio-group>
         </el-form-item>
 
-        <div v-if="paymentMethod" class="payment-instructions">
+        <div v-if="props.paymentMethod" class="payment-instructions">
           <el-alert
             :title="
-              $t(`payments.${paymentMethod.toLowerCase()}InstructionsTitle`)
+              $t(`payments.${props.paymentMethod.toLowerCase()}InstructionsTitle`)
             "
             type="info"
             show-icon
             :closable="false"
           >
             <p>
-              {{ $t(`payments.${paymentMethod.toLowerCase()}Instructions`) }}
+              {{ $t(`payments.${props.paymentMethod.toLowerCase()}Instructions`) }}
             </p>
           </el-alert>
         </div>
@@ -75,15 +92,16 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { ElMessage } from "element-plus";
 import { customerService } from "@/services/customerService";
 import { paymentService } from "@/services/paymentService";
 import { toLocalPhone } from "@/utils/formatters";
 import { CircleDollarSign, Wallet, User } from "lucide-vue-next";
+import { WarningFilled, InfoFilled } from "@element-plus/icons-vue";
 
-defineProps({
+const props = defineProps({
   customerId: {
     type: String,
     default: null,
@@ -94,7 +112,7 @@ defineProps({
   },
 });
 
-defineEmits(["update:customerId", "update:paymentMethod"]);
+const emit = defineEmits(["update:customerId", "update:paymentMethod"]);
 
 const { t } = useI18n();
 
@@ -107,6 +125,15 @@ const paymentMethods = paymentService.PAYMENT_METHODS.filter((p) =>
   ["Cash"].includes(p.value),
 );
 
+// Computed property to check if selected customer is walk-in
+const isWalkinCustomer = computed(() => {
+  if (!props.customerId) return false;
+  const selectedCustomer = customerOptions.value.find(c => c.id === props.customerId);
+  return selectedCustomer?.customerType === 'walkin' || 
+         selectedCustomer?.name?.toLowerCase().includes('walk-in') ||
+         selectedCustomer?.name?.toLowerCase().includes('walkin');
+});
+
 const getPaymentMethodIcon = (method) => {
   switch (method) {
     case "Cash":
@@ -118,7 +145,7 @@ const getPaymentMethodIcon = (method) => {
 
 const getCustomerLabel = (customer) => {
   if (customer.customerType === "walkin") {
-    return t("customers.walkin", "Walk-in Customer");
+    return `${customer.name || t("customers.walkin", "Walk-in Customer")} (${t("customers.walkin")})`;
   }
   if (customer.name && customer.phone) {
     return `${customer.name} - ${toLocalPhone(customer.phone)}`;
@@ -140,7 +167,29 @@ const loadCustomers = async (query = "") => {
       isActive: true,
       limit: 20,
     });
-    customerOptions.value = response.data;
+    
+    // Sort customers to put walk-in customers first
+    const sortedCustomers = response.data.sort((a, b) => {
+      if (a.customerType === 'walkin' && b.customerType !== 'walkin') return -1;
+      if (b.customerType === 'walkin' && a.customerType !== 'walkin') return 1;
+      return 0;
+    });
+    
+    customerOptions.value = sortedCustomers;
+    
+    // Auto-select walk-in customer if no customer is currently selected and it's the initial load
+    if (!props.customerId && !query && sortedCustomers.length > 0) {
+      const walkinCustomer = sortedCustomers.find(customer => 
+        customer.customerType === 'walkin' || 
+        customer.name?.toLowerCase().includes('walk-in') ||
+        customer.name?.toLowerCase().includes('walkin')
+      );
+      
+      if (walkinCustomer) {
+        // Emit the walk-in customer selection as default
+        emit('update:customerId', walkinCustomer.id);
+      }
+    }
   } catch (error) {
     console.error("Failed to load customers:", error);
     ElMessage.error(t("errors.loadDataFailed"));
@@ -191,5 +240,24 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.is-error :deep(.el-select__wrapper) {
+  border-color: var(--el-color-danger);
+  box-shadow: 0 0 0 1px var(--el-color-danger) inset;
+}
+
+.validation-message {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.helper-message {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 </style>

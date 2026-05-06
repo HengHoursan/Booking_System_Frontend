@@ -664,7 +664,7 @@ const confirmCreateBackup = async () => {
     }
   } catch (error) {
     console.error("Error creating backup:", error);
-    ElMessage.error("កំហុសក្នុងការបង្កើតការបម្រុងទុក");
+    ElMessage.error(t("backup.messages.errorCreatingBackup"));
   } finally {
     isCreatingBackup.value = false;
   }
@@ -732,15 +732,15 @@ const confirmDeleteBackup = async (backup) => {
     );
     const response = await backupService.deleteBackup(backup.name);
     if (response.success) {
-      ElMessage.success("បានលុបការបម្រុងទុកដោយជោគជ័យ");
+      ElMessage.success(t("backup.messages.backupDeletedSuccessfully"));
       await refreshBackups();
     } else {
-      ElMessage.error(response.message || "បរាជ័យក្នុងការលុបការបម្រុងទុក");
+      ElMessage.error(response.message || t("backup.messages.failedToDeleteBackup"));
     }
   } catch (error) {
     if (error !== "cancel") {
       console.error("Error deleting backup:", error);
-      ElMessage.error("កំហុសក្នុងការលុបការបម្រុងទុក");
+      ElMessage.error(t("backup.messages.errorDeletingBackup"));
     }
   }
 };

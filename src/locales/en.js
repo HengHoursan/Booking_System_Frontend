@@ -116,6 +116,13 @@ export default {
     paidNav: "Paid",
     unpaidNav: "Unpaid",
     paymentMethod: "Payment Method",
+    validation: {
+      customerRequired: "Please select a customer to proceed with the booking",
+      paymentMethodRequired: "Please select a payment method",
+      validationFailed: "Please check all required fields and try again",
+    },
+    walkinCustomerSelected: "Walk-in customer selected (no registration required)",
+    createFailed: "Failed to create booking. Please try again.",
   },
 
   // Navigation and Layout
@@ -1041,8 +1048,12 @@ export default {
       USER_UPDATE: "Updated User",
       USER_DELETE: "Deleted User",
       USER_RESTORE: "Restored User",
+      ROLE_CREATE: "Created Role",
       ROLE_UPDATE: "Updated Role",
+      ROLE_DELETE: "Deleted Role",
+      PERMISSION_CREATE: "Created Permission",
       PERMISSION_UPDATE: "Updated Permissions",
+      PERMISSION_DELETE: "Deleted Permission",
       LOGIN: "Logged In",
       LOGOUT: "Logged Out",
       REGISTER: "Registered",
