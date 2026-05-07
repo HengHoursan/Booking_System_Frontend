@@ -158,4 +158,36 @@ export const userService = {
     const response = await api.get("/auth/activity-logs", { params });
     return response.data;
   },
+
+  // Password Reset Functions
+
+  // Reset user password (admin function)
+  async resetUserPassword(id, passwordData) {
+    const response = await api.put(`/users/${id}/reset-password`, passwordData);
+    return response.data;
+  },
+
+  // Update user phone number (admin function)
+  async updateUserPhone(id, phoneData) {
+    const response = await api.put(`/users/${id}/phone`, phoneData);
+    return response.data;
+  },
+
+  // Request password reset (public - for users)
+  async requestPasswordReset(phoneData) {
+    const response = await api.post("/auth/request-password-reset", phoneData);
+    return response.data;
+  },
+
+  // Verify OTP and reset password (public - for users)
+  async verifyPasswordReset(resetData) {
+    const response = await api.post("/auth/verify-password-reset", resetData);
+    return response.data;
+  },
+
+  // Change password (authenticated user)
+  async changePassword(passwordData) {
+    const response = await api.post("/auth/change-password", passwordData);
+    return response.data;
+  },
 };
