@@ -32,7 +32,7 @@
             <el-col :xs="24" :sm="12" :md="8">
               <div class="info-item">
                 <span class="info-label">{{ t('backup.schedule') }}</span>
-                <span class="info-value">{{ currentSchedule.cronExpression }}</span>
+                <span class="info-value">{{ getCronDescription(currentSchedule.cronExpression) }}</span>
               </div>
             </el-col>
             <el-col :xs="24" :sm="12" :md="8">
@@ -63,7 +63,14 @@
             <el-switch v-model="scheduleForm.enabled" />
           </el-form-item>
           <el-form-item :label="t('backup.cronExpression')" prop="cronExpression">
-            <el-input v-model="scheduleForm.cronExpression" />
+            <el-select v-model="scheduleForm.cronExpression" placeholder="Select schedule" style="width: 100%">
+              <el-option
+                v-for="item in cronOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
             <div class="cron-help">{{ getCronDescription(scheduleForm.cronExpression) }}</div>
           </el-form-item>
           <el-form-item :label="t('backup.description')" prop="description">
@@ -98,9 +105,16 @@ const isLoading = ref(false);
 const isSaving = ref(false);
 const scheduleFormRef = ref();
 
+const cronOptions = [
+  { label: t('backup.dailyAtMidnight'), value: '0 0 * * *' },
+  { label: t('backup.dailyAt6AM'), value: '0 6 * * *' },
+  { label: t('backup.dailyAt12PM'), value: '0 12 * * *' },
+  { label: t('backup.dailyAt6PM'), value: '0 18 * * *' },
+];
+
 const scheduleForm = reactive({
   enabled: false,
-  cronExpression: '0 2 * * *',
+  cronExpression: '0 0 * * *',
   description: t('backup.scheduledBackup'),
   retentionDays: 7
 });
@@ -137,12 +151,19 @@ const saveSchedule = async () => {
 
 const resetForm = () => {
   if (currentSchedule.value) { Object.assign(scheduleForm, currentSchedule.value); }
-  else { Object.assign(scheduleForm, { enabled: false, cronExpression: '0 2 * * *', description: t('backup.scheduledBackup'), retentionDays: 7 }); }
+  else { Object.assign(scheduleForm, { enabled: false, cronExpression: '0 0 * * *', description: t('backup.scheduledBackup'), retentionDays: 7 }); }
 };
 
 const getCronDescription = (expression) => {
-  // Simple mock description
-  if (expression === '0 2 * * *') return t('backup.dailyAt2AM');
+  const option = cronOptions.find(opt => opt.value === expression);
+  if (option) return option.label;
+
+  // Fallback for known values if they are not in the select yet (e.g. initial load)
+  if (expression === '0 0 * * *') return t('backup.dailyAtMidnight');
+  if (expression === '0 6 * * *') return t('backup.dailyAt6AM');
+  if (expression === '0 12 * * *') return t('backup.dailyAt12PM');
+  if (expression === '0 18 * * *') return t('backup.dailyAt6PM');
+
   return t('backup.customSchedule');
 };
 

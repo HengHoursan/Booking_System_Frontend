@@ -370,9 +370,11 @@ export default {
     selectShowtimeToPreview: "ជ្រើសម៉ោងបញ្ចាំងដើម្បីមើលកៅអី",
     bookNow: "កក់ឥឡូវ",
     availableSeats: "ទំនេរ",
-    bookedSeats: "បានកក់",
+    bookedSeats: "កៅអីដែលបានកក់",
+    freeSeats: "កៅអីទំនេរ",
     unavailableSeats: "មិនអាចប្រើ",
     totalSeats: "សរុប",
+    totalCapacity: "ចំណុះសរុប",
     scheduleTitle: "កម្មវិធីបញ្ចាំង",
     noShowtimesToday: "មិនមានម៉ោងបញ្ចាំងសម្រាប់ថ្ងៃនេះទេ",
     noSeatsConfigured: "មិនមានកៅអីដែលបានកំណត់សម្រាប់សាលនេះ",
@@ -494,6 +496,8 @@ export default {
 
   // Theater Management
   theaters: {
+    theater: "រោងកុន",
+    selectTheater: "ជ្រើសរើសរោងកុន",
     title: "គ្រប់គ្រងរោងកុន",
     allTheaters: "រោងកុនទាំងអស់",
     addTheater: "បន្ថែមរោងកុន",
@@ -535,6 +539,8 @@ export default {
 
   // Hall Management
   halls: {
+    hall: "សាល",
+    selectHall: "ជ្រើសរើសសាល",
     title: "គ្រប់គ្រងសាល",
     allHalls: "សាលទាំងអស់",
     addHall: "បន្ថែមសាល",
@@ -810,6 +816,7 @@ export default {
     startTime: "ម៉ោងចាប់ផ្តើម",
     endTime: "ម៉ោងបញ្ចប់",
     status: "ស្ថានភាព",
+    pastShowtimes: "ម៉ោងបញ្ចាំងកន្លងមក",
     actions: "សកម្មភាព",
     view: "មើល",
     edit: "កែសម្រួល",
@@ -867,10 +874,11 @@ export default {
 
   bookingTickets: {
     title: "សំបុត្រកុន",
-    search: "ស្វែងរកតាមលេខកូដសំបុត្រ...",
-    searchPlaceholder: "Search by ticket code...",
+    search: "ស្វែងរកសំបុត្រកុន",
+    searchPlaceholder: "ស្វែងរកលេខកូដសំបុត្រ...",
     filterByTicketType: "ចម្រាញ់តាមប្រភេទសំបុត្រ",
-    ticketType: "Ticket Type",
+    filterByDate: "ចម្រាញ់តាមកាលបរិច្ឆេទ",
+    ticketType: "ប្រភេទសំបុត្រ",
     adult: "មនុស្សពេញវ័យ",
     child: "កុមារ",
     vip: "VIP",
@@ -892,6 +900,7 @@ export default {
     time: "ពេលវេលា",
     hall: "សាលា",
     customer: "អតិថិជន",
+    phone: "លេខទូរស័ព្ទ",
     payment: "ការទូទាត់",
     price: "តម្លៃ",
     issued: "ចេញនៅ",
@@ -956,6 +965,9 @@ export default {
     createFailed: "បរាជ័យក្នុងការបង្កើតការទូទាត់",
     updateFailed: "បរាជ័យក្នុងការធ្វើបច្ចុប្បន្នភាពការទូទាត់",
     deleteFailed: "បរាជ័យក្នុងការលុបការទូទាត់",
+    filterByPaymentStatus: "ចម្រាញ់តាមស្ថានភាពការទូទាត់",
+    filterByPaymentMethod: "ចម្រាញ់តាមវិធីសាស្រ្តទូទាត់",
+    filterByPaymentDate: "ចម្រាញ់តាមកាលបរិច្ឆេទទូទាត់",
   },
   // System Management
   system: {
@@ -1781,6 +1793,10 @@ export default {
     stepValues: "តម្លៃជំហាន",
     everyHour: "រៀងរាល់ម៉ោង",
     dailyAt2AM: "ប្រចាំថ្ងៃម៉ោង 2 ព្រឹក",
+    dailyAtMidnight: "រៀងរាល់ថ្ងៃនៅកណ្តាលអធ្រាត្រ (០០:០០)",
+    dailyAt6AM: "រៀងរាល់ថ្ងៃនៅម៉ោង ៦ ព្រឹក (០៦:០០)",
+    dailyAt12PM: "រៀងរាល់ថ្ងៃនៅម៉ោង ១២ ថ្ងៃត្រង់ (១២:០០)",
+    dailyAt6PM: "រៀងរាល់ថ្ងៃនៅម៉ោង ៦ ល្ងាច (១៨:០០)",
     every6Hours: "រៀងរាល់ 6 ម៉ោង",
     weeklyOnSunday: "ប្រចាំសប្តាហ៍ថ្ងៃអាទិត្យ",
     monthlyOn1st: "ប្រចាំខែថ្ងៃទី 1",

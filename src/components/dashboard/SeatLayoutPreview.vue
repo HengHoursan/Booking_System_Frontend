@@ -73,7 +73,7 @@
       </div>
 
       <!-- Seat rows (same layout logic as SelectSeatsStep) -->
-      <div class="seat-map">
+      <div class="seat-map" :class="{ 'readonly-map': readonly }">
         <div v-for="row in seatLayout" :key="row.row" class="seat-row">
           <!-- Left label -->
           <div class="row-label row-label-left">
@@ -168,8 +168,8 @@
         </div>
       </div>
 
-      <!-- CTA -->
-      <div class="book-action">
+      <!-- CTA (Hidden in readonly mode) -->
+      <div class="book-action" v-if="!readonly">
         <div class="selected-summary" v-if="selectedSeatIds.size > 0">
           {{ selectedSeatIds.size }} {{ $t("bookings.seats") }} {{ $t("seats.statuses.selected") }}
         </div>
@@ -213,6 +213,10 @@ const props = defineProps({
     default: "",
   },
   hideHeader: {
+    type: Boolean,
+    default: false,
+  },
+  readonly: {
     type: Boolean,
     default: false,
   },
@@ -288,6 +292,7 @@ const getSeatNum = (seat) => {
 };
 
 const toggleSeat = (seat) => {
+  if (props.readonly) return;
   const id = getSeatId(seat);
   if (
     seat.status === "maintenance" ||
@@ -297,13 +302,54 @@ const toggleSeat = (seat) => {
   ) {
     return;
   }
-  if (selectedSeatIds.value.has(id)) {
-    selectedSeatIds.value.delete(id);
-  } else {
+  
+  const isSelecting = !selectedSeatIds.value.has(id);
+
+  if (isSelecting) {
+    // Rule 1: Max 10 seats
     if (selectedSeatIds.value.size >= 10) {
       ElMessage.warning(t("bookings.maxSeatsError", { count: 10 }));
       return;
     }
+
+    // Rule 2: Same Row
+    if (selectedSeatIds.value.size > 0) {
+      const firstId = Array.from(selectedSeatIds.value)[0];
+      const firstSeat = hallSeats.value.find(s => getSeatId(s) === firstId);
+      if (firstSeat && seat.row !== firstSeat.row) {
+        ElMessage.error(t("bookings.sameRowError"));
+        return;
+      }
+
+      // Rule 3: No gaps (Check if new seat creates a gap with existing ones)
+      const rowSeats = hallSeats.value.filter((s) => s.row === seat.row);
+      const selectedInRow = rowSeats.filter((s) => {
+        const sId = getSeatId(s);
+        return selectedSeatIds.value.has(sId) || sId === id;
+      });
+
+      if (selectedInRow.length > 1) {
+        const sorted = [...selectedInRow].sort((a, b) => {
+          const numA = parseInt(getSeatNum(a));
+          const numB = parseInt(getSeatNum(b));
+          return numA - numB;
+        });
+
+        for (let i = 0; i < sorted.length - 1; i++) {
+          const numA = parseInt(getSeatNum(sorted[i]));
+          const numB = parseInt(getSeatNum(sorted[i + 1]));
+          if (numA + 1 !== numB) {
+            ElMessage.error(t("bookings.noGapsError"));
+            return;
+          }
+        }
+      }
+    }
+  }
+
+  if (selectedSeatIds.value.has(id)) {
+    selectedSeatIds.value.delete(id);
+  } else {
     selectedSeatIds.value.add(id);
   }
 };
@@ -572,7 +618,7 @@ onMounted(() => {
 /* Seat layout wrapper — matches SelectSeatsStep container */
 .seat-layout-wrapper {
   background-color: var(--el-bg-color);
-  padding: 40px;
+  padding: 24px;
   border-radius: 8px;
   border: 1px solid var(--el-border-color-lighter);
 }
@@ -581,9 +627,9 @@ onMounted(() => {
 .screen-wrap {
   width: 100%;
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
   position: relative;
-  height: 50px;
+  height: 40px;
 }
 .screen-arc {
   width: 60%;
@@ -608,7 +654,7 @@ onMounted(() => {
 .seat-map {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
   overflow-x: auto;
   padding-bottom: 4px;
@@ -617,7 +663,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 12px;
 }
 .row-label {
   display: flex;
@@ -645,17 +691,17 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 36px;
+  gap: 28px;
 }
 .seats-section {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 /* Seats — matches SelectSeatsStep sizing */
 .seat {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -665,6 +711,13 @@ onMounted(() => {
   transition: all 0.2s ease;
   font-weight: 600;
   position: relative;
+}
+.seat-layout-wrapper:has(.readonly-map) .seat {
+  cursor: default !important;
+}
+.seat-layout-wrapper:has(.readonly-map) .seat:hover {
+  transform: none !important;
+  filter: none !important;
 }
 .seat:hover {
   transform: translateY(-2px);
@@ -747,12 +800,12 @@ onMounted(() => {
 
 /* Legend — matches SelectSeatsStep two-row layout */
 .legend {
-  margin-top: 50px;
+  margin-top: 30px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   width: 100%;
-  padding: 30px;
+  padding: 20px;
   background-color: var(--el-bg-color-overlay);
   border-top: 1px solid var(--el-border-color-lighter);
 }

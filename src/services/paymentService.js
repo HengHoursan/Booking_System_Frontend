@@ -204,19 +204,15 @@ export const paymentService = {
 
   // Constants
   PAYMENT_METHODS: [
-    { value: "Bakong", label: "Bakong", type: "success" },
+    // { value: "Bakong", label: "Bakong", type: "success" },
     { value: "Cash", label: "Cash", type: "primary" },
-    { value: "PayAtCinema", label: "Pay At Cinema", type: "info" },
-    { value: "Card", label: "Card", type: "warning" },
-    { value: "Mobile Banking", label: "Mobile Banking", type: "success" },
-    { value: "Bank Transfer", label: "Bank Transfer", type: "primary" },
   ],
 
   PAYMENT_STATUSES: [
     { value: "Pending", label: "Pending", type: "warning" },
     { value: "Completed", label: "Completed", type: "success" },
     { value: "Failed", label: "Failed", type: "danger" },
-    { value: "Refunded", label: "Refunded", type: "info" },
+    // { value: "Refunded", label: "Refunded", type: "info" },
     { value: "Expired", label: "Expired", type: "danger" },
   ],
 

@@ -5,209 +5,172 @@
       <h2>{{ $t("seats.seatBooking") }}</h2>
     </div>
 
-    <!-- Filters -->
-    <el-card class="filter-card" shadow="never">
-      <el-form :inline="true" class="filter-form">
-        <el-form-item>
-          <el-input
-            v-model="filters.search"
-            :placeholder="$t('seats.searchSeats')"
-            :prefix-icon="Search"
-            clearable
-            @keyup.enter="loadSeatBookings"
-            @clear="loadSeatBookings"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-select
-            v-model="filters.showtimeId"
-            filterable
-            clearable
-            :placeholder="$t('seats.selectShowtime')"
-            @change="handleFilterChange"
-            style="width: 250px"
-            :loading="loading.showtimes"
+    <!-- Visual Showtime Picker -->
+    <el-card class="showtime-picker-card" shadow="never">
+      <div class="picker-header">
+        <div class="date-selector">
+          <el-radio-group v-model="selectedDateFilter" size="default" @change="onDateFilterChange">
+            <el-radio-button label="today">{{ $t('actions.today') || 'Today' }}</el-radio-button>
+            <el-radio-button label="tomorrow">{{ $t('actions.tomorrow') || 'Tomorrow' }}</el-radio-button>
+          </el-radio-group>
+        </div>
+
+        <div class="theater-filters">
+          <div class="filter-item">
+            <span class="filter-label">{{ $t('theaters.theater') }}</span>
+            <el-select 
+              v-model="filters.theater_id" 
+              :placeholder="$t('theaters.selectTheater')"
+              clearable
+              size="default"
+              style="width: 180px"
+              @change="onTheaterChange"
+            >
+              <el-option
+                v-for="theater in theaters"
+                :key="theater.id"
+                :label="theater.name"
+                :value="theater.id"
+              />
+            </el-select>
+          </div>
+
+          <div class="filter-item">
+            <span class="filter-label">{{ $t('halls.hall') }}</span>
+            <el-select 
+              v-model="filters.hall_id" 
+              :placeholder="$t('halls.selectHall')"
+              clearable
+              size="default"
+              :disabled="!filters.theater_id"
+              style="width: 150px"
+              @change="loadShowtimes"
+            >
+              <el-option
+                v-for="hall in halls"
+                :key="hall.id"
+                :label="hall.hall_name"
+                :value="hall.id"
+              />
+            </el-select>
+          </div>
+        </div>
+      </div>
+
+      <div class="showtime-section-header">
+        <div class="showtime-label">
+          <el-icon><Clock /></el-icon>
+          <span>{{ $t('showtimes.title') || 'Showtimes' }}:</span>
+        </div>
+      </div>
+
+      <!-- Horizontal Scrollable List -->
+      <div v-loading="loading.showtimes" class="showtime-list-container">
+        <div v-if="showtimes.length > 0" class="showtime-horizontal-scroll">
+          <div
+            v-for="showtime in showtimes"
+            :key="showtime.id"
+            class="showtime-card"
+            :class="{ 'is-active': filters.showtimeId === showtime.id }"
+            @click="selectShowtime(showtime.id)"
           >
-            <el-option
-              v-for="item in showtimeOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item>
-          <el-select
-            v-model="filters.status"
-            clearable
-            :placeholder="$t('seats.filterByStatus')"
-            @change="handleFilterChange"
-            style="min-width: 200px"
-          >
-            <el-option
-              v-for="status in seatBookingStatus"
-              :key="status.value"
-              :label="$t(`seats.statuses.${status.value}`)"
-              :value="status.value"
-            />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item>
-          <el-select
-            v-model="filters.seat_type"
-            :placeholder="$t('seats.filterByType')"
-            clearable
-            @change="handleFilterChange"
-            style="min-width: 200px"
-          >
-            <el-option
-              v-for="type in seatTypes"
-              :key="type.value"
-              :label="$t(`seats.types.${type.value}`)"
-              :value="type.value"
-            />
-          </el-select>
-        </el-form-item>
-      </el-form>
-    </el-card>
-
-    <!-- Seats Table -->
-    <el-card shadow="never">
-      <el-table
-        :data="seatBookings"
-        v-loading="loading.seatBookings"
-        style="width: 100%"
-        :element-loading-text="$t('common.loading')"
-        :empty-text="$t('messages.noData')"
-        row-key="id"
-      >
-        <el-table-column
-          prop="reference_code"
-          :label="$t('bookings.referenceCode')"
-          width="400"
-        />
-        <el-table-column :label="$t('seats.indentifier')" width="400">
-          <template #default="{ row }">
-            <div class="seat-tags">
-              <el-tag
-                v-for="seat in row.seats"
-                :key="seat._id"
-                size="small"
-                effect="plain"
-                class="seat-tag"
-              >
-                {{ seat.seat_identifier }}
-              </el-tag>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" :label="$t('seats.status')" width="400">
-          <template #default="{ row }">
-            <el-tag :type="getStatusColor(row.status)">
-              {{ $t(`seats.statuses.${row.status}`) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('seats.type')" width="400">
-          <template #default="{ row }">
-            <div class="seat-types">
-              <el-tag
-                v-for="(type, index) in [
-                  ...new Set(row.seats.map((s) => s.seat_type)),
-                ]"
-                :key="index"
-                :type="getSeatTypeColor(type)"
-                size="small"
-                class="type-tag"
-              >
-                {{ $t(`seats.types.${type}`) }}
-              </el-tag>
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <!-- Pagination -->
-      <div class="pagination-wrapper" v-if="pagination.total > 0">
-        <el-pagination
-          v-model:current-page="pagination.currentPage"
-          v-model:page-size="pagination.perPage"
-          :page-sizes="[10, 20, 50, 100]"
-          :total="pagination.total"
-          layout="total, sizes, prev, pager, next, jumper"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
+            <div class="card-time">{{ showtime.start_time }}</div>
+            <div class="card-movie" :title="showtime.movie_title">{{ showtime.movie_title }}</div>
+            <div class="card-hall">{{ showtime.hall_name }}</div>
+          </div>
+        </div>
+        <div v-else class="no-showtimes">
+          <el-icon class="empty-icon"><Calendar /></el-icon>
+          <p>{{ $t('dashboard.noShowtimesToday') }}</p>
+        </div>
       </div>
     </el-card>
+
+    <!-- Grid View (Visual Layout) -->
+    <div class="grid-view-container">
+      <SeatLayoutPreview
+        :showtime-id="filters.showtimeId"
+        hide-header
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
 import { onMounted, reactive, ref, watch } from "vue";
-import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { ElMessage } from "element-plus";
 import { showtimeService } from "@/services/showtimeService";
-import { seatBookingService } from "@/services/seatBookingService";
+import { theaterService } from "@/services/theaterService";
+import { hallService } from "@/services/hallService";
 import { useAppStore } from "@/stores/app";
-import { Search } from "@element-plus/icons-vue";
+import SeatLayoutPreview from "@/components/dashboard/SeatLayoutPreview.vue";
+import { Calendar, Clock } from "@element-plus/icons-vue";
+import dayjs from "dayjs";
 
 const { t } = useI18n();
-const router = useRouter();
 const appStore = useAppStore();
 
 // Reactive data
 const loading = reactive({
   showtimes: false,
-  seatBookings: false,
 });
-const seatBookings = ref([]);
-const showtimeOptions = ref([]);
-const seatTypeOptions = ref([]);
+const showtimes = ref([]);
+const theaters = ref([]);
+const halls = ref([]);
+const selectedDateFilter = ref("today");
+const selectedDate = ref(dayjs().format("YYYY-MM-DD"));
 
 const filters = reactive({
-  search: "",
-  status: "",
   showtimeId: "",
-  seat_type: "",
+  theater_id: "",
+  hall_id: "",
 });
 
-const seatBookingStatus = ref([
-  { value: "booked", label: "Booked" },
-  { value: "locked", label: "Locked" },
-]);
+const loadTheaters = async () => {
+  try {
+    const response = await theaterService.getTheaters({ status: "active" });
+    theaters.value = response.data || [];
+  } catch (error) {
+    console.error("Failed to load theaters:", error);
+  }
+};
 
-const seatTypes = ref([
-  { value: "regular", label: "Regular" },
-  { value: "vip", label: "VIP" },
-  { value: "queen", label: "Queen" },
-  { value: "couple", label: "Couple" },
-]);
-const pagination = reactive({
-  currentPage: 1,
-  perPage: 10,
-  total: 0,
-  total_pages: 0,
-});
+const loadHalls = async (theaterId) => {
+  if (!theaterId) {
+    halls.value = [];
+    return;
+  }
+  try {
+    const response = await hallService.getHalls({ theater_id: theaterId });
+    halls.value = response.data || [];
+  } catch (error) {
+    console.error("Failed to load halls:", error);
+  }
+};
 
-// Load filter data
-const loadShowtimes = async ({
-  limit = 100,
-  status = "scheduled",
-  forBooking = true,
-  search = "",
-} = {}) => {
+// Load full showtimes for the picker
+const loadShowtimes = async () => {
   loading.showtimes = true;
   try {
-    showtimeOptions.value = await showtimeService.getDropdownShowtimes({
-      limit,
-      status,
-      forBooking,
-      search,
+    const response = await showtimeService.getShowtimes({
+      show_date: selectedDate.value,
+      theater_id: filters.theater_id || undefined,
+      hall_id: filters.hall_id || undefined,
+      status: "scheduled",
+      forBooking: true,
+      per_page: 50,
+      sort_by: "start_time",
+      sort_order: "asc",
     });
+    showtimes.value = response.data || [];
+    
+    // Auto-select first showtime if none selected
+    if (showtimes.value.length > 0 && !filters.showtimeId) {
+      filters.showtimeId = showtimes.value[0].id;
+    } else if (showtimes.value.length === 0) {
+      filters.showtimeId = "";
+    }
   } catch (error) {
     console.error("Failed to load showtimes:", error);
     ElMessage.error(t("errors.loadDataFailed"));
@@ -215,119 +178,35 @@ const loadShowtimes = async ({
     loading.showtimes = false;
   }
 };
-// Main data loading
-const loadSeatBookings = async () => {
-  loading.seatBookings = true;
-  try {
-    const params = {
-      showtimeId: filters.showtimeId || undefined,
-      search: filters.search || undefined,
-      page: pagination.currentPage,
-      limit: pagination.perPage,
-      status: filters.status || undefined,
-      seat_type: filters.seat_type || undefined,
-    };
-    const response = await seatBookingService.getSeatBookings(params);
-    console.log(response);
-    if (response.data) {
-      seatBookings.value = response.data.map((sb) => ({
-        id: sb.id,
-        reference_code: sb.reference_code,
-        status: sb.status,
-        seats: sb.seats,
-        phone: sb.phone,
-        customer_name: sb.customer_name,
-        showtime: sb.showtime,
-      }));
 
-      pagination.currentPage =
-        response.current_page || response.currentPage || 1;
-      pagination.perPage = response.per_page || response.limit || 10;
-      pagination.total = response.total || 0;
-      pagination.total_pages = response.total_pages || response.totalPages || 0;
-    } else {
-      seatBookings.value = [];
-      Object.assign(pagination, {
-        currentPage: 1,
-        perPage: 10,
-        total: 0,
-        total_pages: 0,
-      });
-    }
-  } catch (error) {
-    console.error("Load seat bookings error:", error);
-    ElMessage.error(
-      error.response?.data?.message || t("errors.loadDataFailed"),
-    );
-    seatBookings.value = [];
-    Object.assign(pagination, {
-      currentPage: 1,
-      perPage: 10,
-      total: 0,
-      total_pages: 0,
-    });
-  } finally {
-    loading.seatBookings = false;
+const onTheaterChange = (val) => {
+  filters.hall_id = "";
+  loadHalls(val);
+  loadShowtimes();
+};
+
+const onDateFilterChange = (val) => {
+  if (val === "today") {
+    selectedDate.value = dayjs().format("YYYY-MM-DD");
+    loadShowtimes();
+  } else if (val === "tomorrow") {
+    selectedDate.value = dayjs().add(1, "day").format("YYYY-MM-DD");
+    loadShowtimes();
   }
 };
+
+const selectShowtime = (id) => {
+  filters.showtimeId = id;
+};
+
 const handleFilterChange = () => {
-  pagination.currentPage = 1;
-  loadSeatBookings();
+  // Handled by selectShowtime
 };
 
-// Pagination handlers
-const handleSizeChange = (val) => {
-  pagination.perPage = val;
-  pagination.currentPage = 1;
-  loadSeatBookings();
-};
-
-const handleCurrentChange = (val) => {
-  pagination.currentPage = val;
-  loadSeatBookings();
-};
-
-const formatCurrency = (value) => {
-  if (typeof value !== "number") return "";
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(value);
-};
-
-// Color getters
-const getSeatTypeColor = (type) => {
-  const colors = {
-    regular: "",
-    vip: "warning",
-    queen: "success",
-    recliner: "info",
-  };
-  return colors[type] || "";
-};
-
-const getStatusColor = (status) => {
-  const colors = {
-    booked: "info",
-    locked: "warning",
-    available: "success",
-    cancelled: "danger",
-  };
-  return colors[status] || "";
-};
-// Watchers (autoload when filters change)
-watch(
-  () => [filters.search, filters.status, filters.showtimeId, filters.seat_type],
-  () => {
-    pagination.currentPage = 1;
-    loadSeatBookings();
-  },
-  { deep: true },
-);
 // Lifecycle
 onMounted(async () => {
+  loadTheaters();
   await loadShowtimes();
-  await loadSeatBookings();
   appStore.setBreadcrumbs([
     { title: t("nav.dashboard"), path: "/admin/dashboard" },
     { title: t("seats.seatBooking"), path: "/admin/seat-booking" },
@@ -336,44 +215,146 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.seats-list {
+  padding: 0;
+}
+
 .page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 24px;
 }
 
-.filter-card {
-  margin-bottom: 10px;
+.showtime-picker-card {
+  margin-bottom: 12px;
+  border-radius: 12px;
 }
 
-.filter-form {
+.picker-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--el-border-color-extra-light);
+}
+
+.theater-filters {
+  display: flex;
+  gap: 20px;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--el-text-color-secondary);
+}
+
+.showtime-section-header {
+  margin-bottom: 12px;
+}
+
+.showtime-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--el-text-color-secondary);
+}
+
+.showtime-label .el-icon {
+  font-size: 16px;
+  color: var(--el-color-primary);
+}
+
+.showtime-list-container {
+  min-height: 60px;
+}
+
+.showtime-horizontal-scroll {
   display: flex;
   gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 0;
+  overflow-x: auto;
+  padding: 2px 2px 8px 2px;
+  scrollbar-width: thin;
 }
 
-.pagination-wrapper {
-  margin-top: 16px;
-  display: flex;
-  justify-content: center;
+.showtime-horizontal-scroll::-webkit-scrollbar {
+  height: 6px;
 }
 
-.seat-tags,
-.seat-types {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+.showtime-horizontal-scroll::-webkit-scrollbar-thumb {
+  background: var(--el-border-color-lighter);
+  border-radius: 3px;
 }
 
-.seat-tag {
-  background-color: var(--el-color-primary-light-9);
+.showtime-card {
+  flex: 0 0 130px;
+  padding: 10px 12px;
+  background: var(--el-fill-color-lighter);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.showtime-card:hover {
+  background: var(--el-fill-color);
+  transform: translateY(-1px);
+}
+
+.showtime-card.is-active {
+  background: var(--el-color-primary-light-9);
+  border-color: var(--el-color-primary);
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.12);
+}
+
+.card-time {
+  font-size: 16px;
+  font-weight: 800;
   color: var(--el-color-primary);
-  border-color: var(--el-color-primary-light-8);
+  margin-bottom: 2px;
 }
 
-.type-tag {
-  font-weight: 500;
+.card-movie {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 1px;
+}
+
+.card-hall {
+  font-size: 11px;
+  color: var(--el-text-color-secondary);
+}
+
+.no-showtimes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: var(--el-text-color-secondary);
+}
+
+.empty-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+.grid-view-container {
+  margin-top: 10px;
 }
 </style>
