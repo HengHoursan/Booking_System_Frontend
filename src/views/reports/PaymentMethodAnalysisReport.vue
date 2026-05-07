@@ -160,7 +160,7 @@
         <el-table-column
           prop="expired_transactions"
           :label="$t('reports.expired')"
-          width="100"
+          width="120"
           align="center"
           sortable
         >
@@ -173,7 +173,7 @@
         <el-table-column
           prop="success_rate"
           :label="$t('reports.successRate')"
-          width="150"
+          width="180"
           align="center"
           sortable
         >
@@ -189,7 +189,7 @@
         <el-table-column
           prop="failed_rate"
           :label="$t('reports.failedRate')"
-          width="140"
+          width="160"
           align="center"
           sortable
         >
@@ -200,7 +200,7 @@
         <el-table-column
           prop="total_revenue"
           :label="$t('reports.revenue')"
-          width="180"
+          width="200"
           align="right"
           sortable
         >
@@ -213,7 +213,7 @@
         <el-table-column
           prop="revenue_contribution_percentage"
           :label="$t('reports.revenueContribution')"
-          width="180"
+          width="220"
           align="center"
           sortable
         >
@@ -231,7 +231,7 @@
         <el-table-column
           prop="avg_transaction_value"
           :label="$t('reports.avgTransactionValue')"
-          width="200"
+          width="220"
           align="right"
           sortable
         >
@@ -242,7 +242,7 @@
         <el-table-column
           prop="first_transaction_date"
           :label="$t('reports.firstTransactionDate')"
-          width="180"
+          width="220"
           align="center"
           sortable
         >
@@ -256,7 +256,7 @@
         <el-table-column
           prop="last_transaction_date"
           :label="$t('reports.lastTransactionDate')"
-          width="180"
+          width="240"
           align="center"
           sortable
         >

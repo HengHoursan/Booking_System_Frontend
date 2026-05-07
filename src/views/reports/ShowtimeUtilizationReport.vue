@@ -76,7 +76,7 @@
         <el-table-column
           prop="showtime_date"
           :label="$t('reports.showtimeDate')"
-          width="140"
+          width="180"
           align="center"
           sortable
         >
@@ -99,46 +99,46 @@
         <el-table-column
           prop="movie_title"
           :label="$t('reports.movieTitle')"
-          min-width="200"
+          min-width="240"
           show-overflow-tooltip
         />
         <el-table-column
           prop="theater_name"
           :label="$t('reports.theater')"
-          width="150"
+          width="180"
           show-overflow-tooltip
         />
         <el-table-column
           prop="hall_name"
           :label="$t('reports.hall')"
-          width="120"
+          width="140"
           show-overflow-tooltip
         />
         <el-table-column
           prop="total_seats_available"
           :label="$t('reports.totalSeatsAvailable')"
-          width="140"
+          width="180"
           align="center"
           sortable
         />
         <el-table-column
           prop="seats_booked"
           :label="$t('reports.seatsBooked')"
-          width="120"
+          width="160"
           align="center"
           sortable
         />
         <el-table-column
           prop="seats_available"
           :label="$t('reports.seatsAvailable')"
-          width="130"
+          width="150"
           align="center"
           sortable
         />
         <el-table-column
           prop="occupancy_rate"
           :label="$t('reports.occupancyRate')"
-          width="140"
+          width="160"
           align="center"
           sortable
         >
@@ -154,7 +154,7 @@
         <el-table-column
           prop="total_revenue"
           :label="$t('reports.revenue')"
-          width="140"
+          width="160"
           align="right"
           sortable
         >
@@ -167,7 +167,7 @@
         <el-table-column
           prop="revenue_per_seat"
           :label="$t('reports.revenuePerSeat')"
-          width="140"
+          width="170"
           align="right"
           sortable
         >
@@ -178,7 +178,7 @@
         <el-table-column
           prop="booking_count"
           :label="$t('reports.bookingCount')"
-          width="120"
+          width="140"
           align="center"
           sortable
         />
