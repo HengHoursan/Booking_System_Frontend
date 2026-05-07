@@ -421,7 +421,7 @@ export default {
       closed: "បិទ",
       booked: "បានកក់",
       reserved: "បានបម្រុង",
-      expired: "បានផុតកំណត់",
+      failed: "បានបរាជ័យ",
       canceled: "បានបោះបង់",
       unavailable: "មិនអាចប្រើបាន",
       selected: "បានជ្រើសរើស",
@@ -501,6 +501,12 @@ export default {
     loadError: "បរាជ័យក្នុងការផ្ទុករោងកុន",
     updateTheater: "ធ្វើបច្ចុប្បន្នភាពរោងកុន",
     confirmDelete: "តើអ្នកប្រាកដថាចង់លុបរោងកុននេះមែនទេ?",
+    statuses: {
+      active: "សកម្ម",
+      maintenance: "កំពុងថែទាំ",
+      out_of_order: "ខូច",
+      reserved: "បម្រុងទុក",
+    },
   },
 
   // Hall Management
@@ -869,7 +875,8 @@ export default {
     paymentDetails: "ព័ត៌មានលម្អិតការបង់ប្រាក់",
     paymentMethod: "វិធីសាស្រ្តបង់ប្រាក់",
     expiresIn: "ផុតកំណត់ក្នុង",
-    screenshotInstruction: "សូមថតរូបអេក្រង់ (Screenshot) នៃ QR កូដនេះ ដើម្បីបង់ប្រាក់តាមរយៈកម្មវិធីធនាគាររបស់អ្នក។",
+    screenshotInstruction:
+      "សូមថតរូបអេក្រង់ (Screenshot) នៃ QR កូដនេះ ដើម្បីបង់ប្រាក់តាមរយៈកម្មវិធីធនាគាររបស់អ្នក។",
     paymentFailed:
       "ការបង់ប្រាក់មិនទាន់បានបញ្ចប់។ ការកក់របស់អ្នកត្រូវបានលុបចោល។",
     paymentExpired: "ការទូទាត់បានផុតកំណត់",
@@ -1221,6 +1228,7 @@ export default {
     clearAllNotifications: "តើអ្នកប្រាកដថាចង់លុបការជូនដំណឹងទាំងអស់មែនទេ?",
     networkError: "កំហុសបណ្តាញ។ សូមពិនិត្យការភ្ជាប់របស់អ្នក។",
     serverError: "កំហុសម៉ាស៊ីនផ្តល់សេវា។ សូមសាកល្បងម្តងទៀត។",
+    httpError: "កំហុស HTTP",
     validationFailed: "ការផ្ទៀងផ្ទាត់មិនបានជោគជ័យ",
     accessDenied: "ការចូលប្រើត្រូវបានបដិសេធ។ អ្នកមិនមានសិទ្ធិ។",
     sessionExpired: "សេសិនផុតកំណត់។ សូមចូលម្តងទៀត។",

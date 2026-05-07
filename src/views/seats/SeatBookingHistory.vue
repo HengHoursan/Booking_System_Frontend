@@ -11,7 +11,7 @@
         <el-form-item>
           <el-input
             v-model="filters.search"
-            :placeholder="$t('seats.searchHistory')"
+            :placeholder="$t('seats.search')"
             :prefix-icon="Search"
             clearable
             @keyup.enter="loadSeatBookingHistory"
@@ -354,8 +354,11 @@ const loadSeatBookingHistory = async () => {
     };
     const response = await seatBookingService.getSeatBookingHistory(params);
     if (response.data) {
-      seatBookingHistory.value = response.data.histories;
-      console.log(response.data.histories);
+      seatBookingHistory.value = response.data.histories.map(h => ({
+        ...h,
+        action: h.action === 'expired' ? 'failed' : h.action
+      }));
+      console.log(seatBookingHistory.value);
       pagination.currentPage = response.data.pagination.currentPage;
       pagination.perPage = response.data.pagination.limit;
       pagination.total = response.data.pagination.totalCount;

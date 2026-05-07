@@ -121,7 +121,8 @@ export default {
       paymentMethodRequired: "Please select a payment method",
       validationFailed: "Please check all required fields and try again",
     },
-    walkinCustomerSelected: "Walk-in customer selected (no registration required)",
+    walkinCustomerSelected:
+      "Walk-in customer selected (no registration required)",
     createFailed: "Failed to create booking. Please try again.",
   },
 
@@ -516,7 +517,7 @@ export default {
       closed: "Closed",
       booked: "Booked",
       reserved: "Reserved",
-      expired: "Expired",
+      failed: "Failed",
       canceled: "Canceled",
       unavailable: "Unavailable",
       priceRestricted: "Different Price",
@@ -614,6 +615,16 @@ export default {
     },
     updateTheater: "Update Theater",
     confirmDelete: "Are you sure you want to delete this theater?",
+    createSuccess: "Theater created successfully.",
+    updateSuccess: "Theater updated successfully.",
+    deleteSuccess: "Theater deleted successfully.",
+    deleteError: "Failed to delete theater.",
+    confirmDeleteMultiple:
+      "Are you sure you want to delete {count} selected theater(s)?",
+    deleteMultipleSuccess: "{count} theaters deleted successfully.",
+    deleteMultipleError: "Failed to delete {count} selected theater(s).",
+    loadError: "Failed to load theaters.",
+
   },
   // Hall Management
   halls: {
@@ -644,6 +655,8 @@ export default {
     createSuccess: "Hall created successfully",
     updateHall: "Update Hall",
     updateSuccess: "Hall updated successfully",
+    deleteError: "Failed to delete hall",
+    deleteSuccess: "Hall deleted successfully",
     confirmDelete: "Are you sure you want to delete this hall?",
   },
 
@@ -891,7 +904,8 @@ export default {
     paymentMethod: "Payment Method",
     expiresIn: "Expires In",
     scanToPay: "Scan QR Code with any banking app to pay",
-    screenshotInstruction: "Please take a screenshot of this QR code to pay via your banking app.",
+    screenshotInstruction:
+      "Please take a screenshot of this QR code to pay via your banking app.",
     paymentExpired: "Payment Expired",
     paymentFailed: "Payment not completed. Your booking has been cancelled.",
     paymentSuccess: "Payment Successful",
@@ -908,6 +922,7 @@ export default {
     unpaid: "Unpaid",
     description: "Description",
     searchPayments: "Search payments...",
+    createSuccess: "Payment created successfully.",
   },
 
   // System Management
@@ -1221,6 +1236,7 @@ export default {
     errorClearingNotifications: "Failed to clear notifications.",
     networkError: "Network error. Please check your connection.",
     serverError: "Server error. Please try again later.",
+    httpError: "Http error",
     validationFailed: "Validation failed",
     accessDenied: "Access denied. You don't have permission.",
     sessionExpired: "Session expired. Please login again.",
@@ -1587,7 +1603,8 @@ export default {
     },
     phoneNumberDialog: {
       title: "Phone Number Required",
-      message: "Please provide your phone number to continue with the booking. This helps us contact you if needed.",
+      message:
+        "Please provide your phone number to continue with the booking. This helps us contact you if needed.",
       placeholder: "e.g., 012 345 678",
       save: "Save & Continue",
       cancel: "Cancel",
