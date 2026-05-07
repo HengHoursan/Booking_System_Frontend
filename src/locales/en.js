@@ -807,6 +807,7 @@ export default {
       scheduled: "Scheduled",
       completed: "Completed",
       expired: "Expired",
+      cancelled: "Cancelled",
     },
     createSingle: "Create Single",
     createMultiple: "Create Multiple",

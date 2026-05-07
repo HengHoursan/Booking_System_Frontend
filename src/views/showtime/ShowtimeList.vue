@@ -551,8 +551,9 @@ onMounted(async () => {
 .filter-card {
   margin-bottom: 24px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--el-bg-color-overlay);
   backdrop-filter: blur(10px);
+  border: 1px solid var(--el-border-color-lighter);
 }
 
 .page-header {
@@ -656,7 +657,7 @@ onMounted(async () => {
 
 .showtime-card {
   position: relative;
-  background: white;
+  background: var(--el-bg-color);
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -684,7 +685,7 @@ onMounted(async () => {
   top: 12px;
   left: 12px;
   z-index: 10;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--el-bg-color-overlay);
   padding: 4px;
   border-radius: 6px;
   line-height: 1;
