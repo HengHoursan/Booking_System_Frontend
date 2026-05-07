@@ -917,6 +917,9 @@ export default {
     createFailed: "បរាជ័យក្នុងការបង្កើតការទូទាត់",
     updateFailed: "បរាជ័យក្នុងការធ្វើបច្ចុប្បន្នភាពការទូទាត់",
     deleteFailed: "បរាជ័យក្នុងការលុបការទូទាត់",
+    filterByPaymentStatus: "ចម្រាញ់តាមស្ថានភាពការទូទាត់",
+    filterByPaymentMethod: "ចម្រាញ់តាមវិធីសាស្រ្តទូទាត់",
+    filterByPaymentDate: "ចម្រាញ់តាមកាលបរិច្ឆេទទូទាត់",
   },
   // System Management
   system: {

@@ -212,7 +212,7 @@ export const paymentService = {
     { value: "Pending", label: "Pending", type: "warning" },
     { value: "Completed", label: "Completed", type: "success" },
     { value: "Failed", label: "Failed", type: "danger" },
-    { value: "Refunded", label: "Refunded", type: "info" },
+    // { value: "Refunded", label: "Refunded", type: "info" },
     { value: "Expired", label: "Expired", type: "danger" },
   ],
 

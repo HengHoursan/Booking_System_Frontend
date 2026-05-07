@@ -925,6 +925,9 @@ export default {
     description: "Description",
     searchPayments: "Search payments...",
     createSuccess: "Payment created successfully.",
+    filterByPaymentStatus: "Filter by payment status",
+    filterByPaymentMethod: "Filter by payment method",
+    filterByPaymentDate: "Filter by payment date",
   },
 
   // System Management

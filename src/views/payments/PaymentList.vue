@@ -15,6 +15,7 @@
             clearable
             @keyup.enter="fetchPayments"
             @clear="fetchPayments"
+            style="width: 250px"
           />
         </el-form-item>
         <el-form-item>
@@ -22,8 +23,8 @@
             v-model="filters.status"
             clearable
             @change="handleFilterChange"
-            style="width: 200px"
-            :placeholder="$t('common.status')"
+            style="width: 250px"
+            :placeholder="$t('payments.filterByPaymentStatus')"
           >
             <el-option
               v-for="status in paymentStatusOptions"
@@ -32,6 +33,33 @@
               :value="status.value"
             />
           </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select
+            v-model="filters.payment_method"
+            clearable
+            @change="handleFilterChange"
+            style="width: 250px"
+            :placeholder="$t('payments.filterByPaymentMethod')"
+          >
+            <el-option
+              v-for="method in paymentMethodOptions"
+              :key="method.value"
+              :label="method.label"
+              :value="method.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-date-picker
+            v-model="filters.payment_date"
+            type="date"
+            :placeholder="$t('payments.filterByPaymentDate')"
+            clearable
+            style="width: 250px"
+            value-format="YYYY-MM-DD"
+            @change="handleFilterChange"
+          />
         </el-form-item>
       </el-form>
     </el-card>
@@ -116,7 +144,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive,watch } from "vue";
+import { ref, onMounted, reactive, watch } from "vue";
 import { paymentService } from "@/services/paymentService"; // Destructure paymentService
 import { ElMessage, ElTag } from "element-plus";
 import { useI18n } from "vue-i18n"; // Import useI18n
@@ -131,6 +159,8 @@ const loading = reactive({
 const filters = reactive({
   search: "",
   status: "",
+  payment_method: "",
+  payment_date: null,
 });
 
 const pagination = reactive({
@@ -150,6 +180,9 @@ const fetchPayments = async () => {
       limit: pagination.per_page || 10,
       search: filters.search || undefined,
       status: filters.status || undefined,
+      payment_method: filters.payment_method || undefined,
+      date_from: filters.payment_date ? `${filters.payment_date}T00:00:00` : undefined,
+      date_to: filters.payment_date ? `${filters.payment_date}T23:59:59` : undefined,
     };
     const response = await paymentService.getPayments(params);
     if (response && Array.isArray(response.data)) {
@@ -164,6 +197,7 @@ const fetchPayments = async () => {
           fromAccount_id: payment.fromAccount_id,
           toAccount_id: payment.toAccount_id,
           booking: payment.booking || {},
+          payment_method: payment.payment_method || "",
         }));
       pagination.total = response.total;
       pagination.current_page = response.current_page;
@@ -206,16 +240,10 @@ const getPaymentMethodType = (method) => {
 };
 
 // Watchers (autoload when filters change)
-watch(
-  [
-    () => filters.search,
-    () => filters.status,
-  ],
-  () => {
-    pagination.current_page = 1;
-    fetchPayments();
-  }
-);
+watch([() => filters.search, () => filters.status, () => filters.payment_method, () => filters.payment_date], () => {
+  pagination.current_page = 1;
+  fetchPayments();
+});
 
 onMounted(() => {
   fetchPayments();

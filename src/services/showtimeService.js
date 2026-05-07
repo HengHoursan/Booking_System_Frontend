@@ -405,9 +405,11 @@ export const showtimeService = {
     if (response && response.data) {
       return response.data.map((s) => ({
         value: s.id,
-        label: `${s.movie_title || "N/A"} (${s.hall_name || "N/A"}) - ${
-          s.show_date
-        } ${s.start_time}`,
+        label: `${s.movie_title || "N/A"} (${s.hall_name || "N/A"}) - ${s.show_date} ${s.start_time}`,
+        movie_title: s.movie_title,
+        hall_name: s.hall_name,
+        show_date: s.show_date,
+        start_time: s.start_time,
       }));
     }
 
