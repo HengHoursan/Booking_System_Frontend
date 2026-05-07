@@ -572,7 +572,7 @@ onMounted(() => {
 /* Seat layout wrapper — matches SelectSeatsStep container */
 .seat-layout-wrapper {
   background-color: var(--el-bg-color);
-  padding: 40px;
+  padding: 24px;
   border-radius: 8px;
   border: 1px solid var(--el-border-color-lighter);
 }
@@ -581,9 +581,9 @@ onMounted(() => {
 .screen-wrap {
   width: 100%;
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
   position: relative;
-  height: 50px;
+  height: 40px;
 }
 .screen-arc {
   width: 60%;
@@ -608,7 +608,7 @@ onMounted(() => {
 .seat-map {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
   overflow-x: auto;
   padding-bottom: 4px;
@@ -617,7 +617,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 12px;
 }
 .row-label {
   display: flex;
@@ -645,17 +645,17 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 36px;
+  gap: 28px;
 }
 .seats-section {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 /* Seats — matches SelectSeatsStep sizing */
 .seat {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -747,12 +747,12 @@ onMounted(() => {
 
 /* Legend — matches SelectSeatsStep two-row layout */
 .legend {
-  margin-top: 50px;
+  margin-top: 30px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   width: 100%;
-  padding: 30px;
+  padding: 20px;
   background-color: var(--el-bg-color-overlay);
   border-top: 1px solid var(--el-border-color-lighter);
 }
