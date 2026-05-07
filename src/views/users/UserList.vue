@@ -52,6 +52,12 @@
         <el-table-column prop="name" :label="$t('users.name')" />
         <el-table-column prop="username" :label="$t('users.username')" />
         <el-table-column prop="email" :label="$t('users.email')" />
+        <el-table-column prop="phone" :label="$t('users.phone')" width="120">
+          <template #default="{ row }">
+            <span v-if="row.phone">{{ row.phone }}</span>
+            <el-text v-else type="info" size="small">{{ $t('common.notSet') }}</el-text>
+          </template>
+        </el-table-column>
         <el-table-column prop="role" :label="$t('users.role')" width="150">
           <template #default="{ row }">
             <el-tag
@@ -77,26 +83,50 @@
             :label="$t('users.created')"
             width="160"
         /> -->
-        <el-table-column :label="$t('users.actions')" width="140">
+        <el-table-column :label="$t('users.actions')" width="200">
           <template #default="{ row }">
-            <el-button
-              v-permission="'users.edit'"
-              type="primary"
-              size="small"
-              link
-              @click="editUser(row.id)"
-            >
-              {{ $t("users.edit") }}
-            </el-button>
-            <el-button
-              v-permission="'users.delete'"
-              type="danger"
-              size="small"
-              link
-              @click="deleteUser(row.id)"
-            >
-              {{ $t("users.delete") }}
-            </el-button>
+            <el-dropdown trigger="click" @command="handleActionCommand">
+              <el-button type="primary" size="small">
+                {{ $t('users.actions') }}
+                <el-icon class="el-icon--right">
+                  <ArrowDown />
+                </el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item
+                    v-permission="'users.edit'"
+                    :command="{ action: 'edit', user: row }"
+                  >
+                    <el-icon><Edit /></el-icon>
+                    {{ $t("users.edit") }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-permission="'users.edit'"
+                    :command="{ action: 'resetPassword', user: row }"
+                    divided
+                  >
+                    <el-icon><Key /></el-icon>
+                    {{ $t("users.resetPassword") }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-permission="'users.edit'"
+                    :command="{ action: 'updatePhone', user: row }"
+                  >
+                    <el-icon><Phone /></el-icon>
+                    {{ $t("users.updatePhone") }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-permission="'users.delete'"
+                    :command="{ action: 'delete', user: row }"
+                    divided
+                  >
+                    <el-icon><Delete /></el-icon>
+                    {{ $t("users.delete") }}
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -132,6 +162,20 @@
       :user-id="selectedUserId"
       @success="handleFormSuccess"
     />
+
+    <!-- Password Reset Dialog -->
+    <PasswordResetDialog
+      v-model="showPasswordResetDialog"
+      :user="selectedUser"
+      @success="handlePasswordResetSuccess"
+    />
+
+    <!-- Phone Update Dialog -->
+    <PhoneUpdateDialog
+      v-model="showPhoneUpdateDialog"
+      :user="selectedUser"
+      @success="handlePhoneUpdateSuccess"
+    />
   </div>
 </template>
 
@@ -140,10 +184,12 @@ import { onMounted, ref, watch } from "vue";
 import { useAppStore } from "@/stores/app";
 import { userService } from "@/services/userService";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { Plus, Search } from "@element-plus/icons-vue";
+import { Plus, Search, ArrowDown, Edit, Key, Phone, Delete } from "@element-plus/icons-vue";
 import { useI18n } from "vue-i18n";
 import { debounce } from "lodash-es";
 import UserFormDialog from "@/components/users/UserFormDialog.vue";
+import PasswordResetDialog from "@/components/users/PasswordResetDialog.vue";
+import PhoneUpdateDialog from "@/components/users/PhoneUpdateDialog.vue";
 
 const appStore = useAppStore();
 
@@ -159,6 +205,9 @@ const userTable = ref(null);
 const selectedUsers = ref([]);
 const showFormDialog = ref(false);
 const selectedUserId = ref("");
+const showPasswordResetDialog = ref(false);
+const showPhoneUpdateDialog = ref(false);
+const selectedUser = ref(null);
 const { t } = useI18n();
 
 // Debounced search function
@@ -242,6 +291,50 @@ const editUser = (id) => {
 // Handle form success
 const handleFormSuccess = () => {
   loadUsers();
+};
+
+// Handle dropdown action commands
+const handleActionCommand = (command) => {
+  const { action, user } = command;
+  
+  switch (action) {
+    case 'edit':
+      editUser(user.id);
+      break;
+    case 'resetPassword':
+      resetUserPassword(user);
+      break;
+    case 'updatePhone':
+      updateUserPhone(user);
+      break;
+    case 'delete':
+      deleteUser(user.id);
+      break;
+  }
+};
+
+// Reset user password
+const resetUserPassword = (user) => {
+  selectedUser.value = user;
+  showPasswordResetDialog.value = true;
+};
+
+// Update user phone
+const updateUserPhone = (user) => {
+  selectedUser.value = user;
+  showPhoneUpdateDialog.value = true;
+};
+
+// Handle password reset success
+const handlePasswordResetSuccess = () => {
+  loadUsers();
+  selectedUser.value = null;
+};
+
+// Handle phone update success
+const handlePhoneUpdateSuccess = () => {
+  loadUsers();
+  selectedUser.value = null;
 };
 
 // Delete single user
