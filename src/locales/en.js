@@ -858,6 +858,7 @@ export default {
     searchPlaceholder: "Search by ticket code...",
     filterByTicketType: "Filter by ticket type",
     ticketType: "Ticket Type",
+    filterByDate: "Filter by date",
     ticketCode: "Ticket Code",
     user: "User",
     bookingId: "Booking ID",

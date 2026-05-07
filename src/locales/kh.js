@@ -829,6 +829,7 @@ export default {
     search: "ស្វែងរកសំបុត្រកុន",
     searchPlaceholder: "ស្វែងរកលេខកូដសំបុត្រ...",
     filterByTicketType: "ចម្រាញ់តាមប្រភេទសំបុត្រ",
+    filterByDate: "ចម្រាញ់តាមកាលបរិច្ឆេទ",
     ticketType: "ប្រភេទសំបុត្រ",
     adult: "មនុស្សពេញវ័យ",
     child: "កុមារ",
