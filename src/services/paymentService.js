@@ -206,10 +206,6 @@ export const paymentService = {
   PAYMENT_METHODS: [
     { value: "Bakong", label: "Bakong", type: "success" },
     { value: "Cash", label: "Cash", type: "primary" },
-    { value: "PayAtCinema", label: "Pay At Cinema", type: "info" },
-    { value: "Card", label: "Card", type: "warning" },
-    { value: "Mobile Banking", label: "Mobile Banking", type: "success" },
-    { value: "Bank Transfer", label: "Bank Transfer", type: "primary" },
   ],
 
   PAYMENT_STATUSES: [

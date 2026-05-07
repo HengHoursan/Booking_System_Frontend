@@ -826,10 +826,10 @@ export default {
 
   bookingTickets: {
     title: "សំបុត្រកុន",
-    search: "ស្វែងរកតាមលេខកូដសំបុត្រ...",
-    searchPlaceholder: "Search by ticket code...",
+    search: "ស្វែងរកសំបុត្រកុន",
+    searchPlaceholder: "ស្វែងរកលេខកូដសំបុត្រ...",
     filterByTicketType: "ចម្រាញ់តាមប្រភេទសំបុត្រ",
-    ticketType: "Ticket Type",
+    ticketType: "ប្រភេទសំបុត្រ",
     adult: "មនុស្សពេញវ័យ",
     child: "កុមារ",
     vip: "VIP",
@@ -851,6 +851,7 @@ export default {
     time: "ពេលវេលា",
     hall: "សាលា",
     customer: "អតិថិជន",
+    phone: "លេខទូរស័ព្ទ",
     payment: "ការទូទាត់",
     price: "តម្លៃ",
     issued: "ចេញនៅ",

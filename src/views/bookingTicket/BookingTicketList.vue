@@ -12,7 +12,7 @@
           class="search-input"
           :prefix-icon="Search"
           clearable
-          style="width: 200px"
+          style="width: 280px"
           @input="debouncedSearch"
         />
         <el-select
@@ -51,14 +51,43 @@
           :label="$t('bookingTickets.ticketCode')"
           width="250"
         />
-        <el-table-column
-          prop="customer_id.name"
-          :label="$t('bookingTickets.customer')"
-        />
-        <el-table-column
+        <el-table-column :label="$t('bookingTickets.customer')" width="240">
+          <template #default="{ row }">
+            <div v-if="row.customer_id">
+              <div>
+                <strong>
+                  {{
+                    row.customer_id.name ||
+                    (row.customer_id.phone
+                      ? 'Walk-in Customer'
+                      : '-')
+                  }}
+                </strong>
+              </div>
+              <div
+                v-if="row.customer_id.phone"
+                class="text-muted"
+                style="display: flex; align-items: center; gap: 4px"
+              >
+                <el-icon><Phone /></el-icon>
+                <span>{{ toLocalPhone(row.customer_id.phone) }}</span>
+              </div>
+              <el-tag
+                v-if="row.customer_id.customerType"
+                :type="getCustomerTypeTag(row.customer_id.customerType)"
+                size="small"
+                style="margin-top: 4px"
+              >
+                {{ $t(`customers.${row.customer_id.customerType}`) }}
+              </el-tag>
+            </div>
+            <span v-else class="text-muted">{{ $t('bookings.noCustomerData') }}</span>
+          </template>
+        </el-table-column>
+        <!-- <el-table-column
           prop="booking_id.reference_code"
           :label="$t('bookingTickets.bookingId')"
-        />
+        /> -->
         <el-table-column
           prop="showtime_id.movie_id.title"
           :label="$t('bookingTickets.movie')"
@@ -143,10 +172,10 @@ import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import { bookingTicketService } from "@/services/bookingTicketService";
 import { ElMessage } from "element-plus";
-import { Search, Printer } from "@element-plus/icons-vue";
+import { Search, Printer, Phone } from "@element-plus/icons-vue";
 import { useI18n } from "vue-i18n";
 import { debounce } from "lodash-es";
-import { formatDate } from "@/utils/formatters";
+import { formatDate, toLocalPhone } from "@/utils/formatters";
 import TicketPreview from "@/components/bookingTicket/TicketPreview.vue";
 
 const appStore = useAppStore();
@@ -164,6 +193,15 @@ const { t } = useI18n();
 
 const printDialogVisible = ref(false);
 const selectedTicket = ref(null);
+
+const getCustomerTypeTag = (type) => {
+  switch (type) {
+    case 'member': return 'success';
+    case 'walkin': return 'info';
+    case 'guest': return 'warning';
+    default: return 'primary';
+  }
+};
 
 const debouncedSearch = debounce(() => {
   currentPage.value = 1;

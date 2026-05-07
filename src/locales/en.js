@@ -854,7 +854,7 @@ export default {
   },
   bookingTickets: {
     title: "Booking Tickets",
-    search: "Search by ticket code, user, or movie...",
+    search: "Search by ticket",
     searchPlaceholder: "Search by ticket code...",
     filterByTicketType: "Filter by ticket type",
     ticketType: "Ticket Type",
@@ -879,6 +879,7 @@ export default {
     time: "Time",
     hall: "Hall",
     customer: "Customer",
+    phone: "Phone Number",
     payment: "Payment",
     price: "Price",
     issued: "Issued",
