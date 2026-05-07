@@ -70,7 +70,8 @@
               <el-option :label="$t('reports.allStatuses')" value="" />
               <el-option :label="$t('bookings.pending')" value="Pending" />
               <el-option :label="$t('bookings.completed')" value="Completed" />
-              <el-option :label="$t('bookings.expired')" value="Expired" />
+              <el-option :label="$t('bookings.failed')" value="Failed" />
+              <!-- <el-option :label="$t('bookings.failed')" value="Expired" /> -->
             </el-select>
           </el-form-item>
           <el-form-item :label="$t('customers.customerType')">
@@ -220,6 +221,7 @@ const getStatusTag = (status) => {
   const tags = {
     Completed: "success",
     Pending: "warning",
+    Failed: "danger",
     Expired: "danger",
   };
   return tags[status] || "";

@@ -51,7 +51,7 @@ export default {
     notes: "ចំណាំ",
     confirmed: "បានបញ្ចប់",
     pending: "កំពុងរង់ចាំ",
-    expired: "បានផុតកំណត់",
+    expired: "បរាជ័យ",
     completed: "បានបញ្ចប់",
     paid: "បានបង់ប្រាក់",
     unpaid: "មិនទាន់បង់ប្រាក់",
@@ -109,7 +109,7 @@ export default {
       "អ្នកអាចផ្លាស់ប្តូរទៅកៅអីដែលមានតម្លៃដូចគ្នា ({price}) ជាមួយការកក់បច្ចុប្បន្នរបស់អ្នកប៉ុណ្ណោះ។",
     confirmedNavHeader: "បានបញ្ចប់",
     pendingNavHeader: "កំពុងរង់ចាំ",
-    expiredNavHeader: "បានផុតកំណត់",
+    expiredNavHeader: "បរាជ័យ",
     completedNavHeader: "បានបញ្ចប់",
     refundedNavHeader: "បានសងប្រាក់វិញ",
     paidNavHeader: "បានបង់រួច",
@@ -190,8 +190,8 @@ export default {
         'បានទទួលការបង់ប្រាក់! សំបុត្ររបស់អ្នកសម្រាប់ "{movie}" ត្រូវបានបញ្ចប់។\n\nលេខយោង: {ref}\nកៅអី: {seats}\n\nបង្ហាញកូដនេះនៅកន្លែងលក់សំបុត្រ ឬប្រើវាដើម្បីចូល។',
     },
     booking_expired: {
-      title: "ការកក់បានផុតកំណត់",
-      message: "ការកក់ {ref} របស់អ្នកបានផុតកំណត់។",
+      title: "ការកក់បានបរាជ័យ",
+      message: "ការកក់ {ref} របស់អ្នកបានបរាជ័យ។",
     },
     booking_updated: {
       title: "ការកក់ត្រូវបានធ្វើបច្ចុប្បន្នភាព",

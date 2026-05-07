@@ -171,7 +171,8 @@ export const bookingService = {
   BOOKING_STATUSES: [
     { value: "Completed", label: "Completed", type: "success" },
     { value: "Pending", label: "Pending", type: "info" },
-    { value: "Expired", label: "Expired", type: "danger" },
+    { value: "Failed", label: "Failed", type: "danger" },
+    // { value: "Expired", label: "Failed", type: "danger" },
   ],
 
   PAYMENT_STATUSES: [

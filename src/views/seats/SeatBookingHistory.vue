@@ -299,7 +299,7 @@ const getCustomerTypeTag = (type) => {
 const seatBookingActions = ref([
   { value: "booked", label: "Booked" },
   // { value: "locked", label: "Locked" },
-  { value: "expired", label: "Expired" },
+  { value: "failed", label: "Failed" },
 ]);
 const seatTypes = ref([
   { value: "regular", label: "Regular" },
@@ -396,7 +396,7 @@ const getActionColor = (action) => {
   const colors = {
     booked: "info",
     locked: "warning",
-    expired: "danger",
+    failed: "danger",
   };
   return colors[action] || "";
 };

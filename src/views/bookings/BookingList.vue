@@ -511,8 +511,8 @@ const canEditSeats = (booking) => {
     return false;
   }
   
-  // Cannot edit seats for expired bookings
-  if (booking.booking_status === 'Expired') {
+  // Cannot edit seats for failed bookings
+  if (booking.booking_status === 'Failed') {
     return false;
   }
   
@@ -563,7 +563,7 @@ const editForm = reactive({
 watch(
   () => editForm.booking_status,
   (newStatus) => {
-    if (newStatus === "Expired") {
+    if (newStatus === "Failed") {
       editForm.payment_status = "Failed";
     }
   },
@@ -618,7 +618,7 @@ const getCustomerTypeTag = (type) => {
   }
 };
 const bookingStatusOptions = bookingService.BOOKING_STATUSES;
-const paymentStatusOptions = bookingService.PAYMENT_STATUSES;
+// const paymentStatusOptions = bookingService.PAYMENT_STATUSES;
 const paymentMethods = paymentService.PAYMENT_METHODS;
 
 const loadBookings = async () => {

@@ -74,7 +74,7 @@ const getStatusColor = (status) => {
       return "#10b981"; // Green
     case "Pending":
       return "#f59e0b"; // Orange/Amber
-    case "Expired":
+    case "Failed":
       return "#ef4444"; // Red
     default:
       return "#6b7280"; // Gray

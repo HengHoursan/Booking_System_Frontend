@@ -52,7 +52,7 @@ export default {
     notes: "Notes",
     confirmed: "Completed",
     pending: "Pending",
-    expired: "Expired",
+    expired: "Failed",
     completed: "Completed",
     paid: "Paid",
     unpaid: "Unpaid",
@@ -110,7 +110,7 @@ export default {
       "You can only change to seats with the same price ({price}) as your current booking.",
     confirmedNav: "Completed",
     pendingNav: "Pending",
-    expiredNav: "Expired",
+    expiredNav: "Failed",
     completedNav: "Completed",
     refundedNav: "Refunded",
     paidNav: "Paid",
@@ -191,8 +191,8 @@ export default {
         'Payment received! Your tickets for "{movie}" are completed.\n\nReference: {ref}\nSeats: {seats}\n\nShow this code at the counter or use it to enter.',
     },
     booking_expired: {
-      title: "Booking Expired",
-      message: "Your booking {ref} has expired.",
+      title: "Booking Failed",
+      message: "Your booking {ref} has failed.",
     },
     booking_updated: {
       title: "Booking Updated",

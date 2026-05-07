@@ -306,8 +306,10 @@ const getStatusType = (status) => {
       return "success";
     case "Pending":
       return "warning";
-    case "Expired":
+    case "Failed":
       return "danger";
+    // case "Expired":
+    //   return "danger";
     default:
       return "info";
   }
