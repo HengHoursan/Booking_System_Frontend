@@ -33,13 +33,13 @@ const paymentMethods = computed(() => [
     description: t("client.checkout.bakongDesc"),
     tag: t("client.checkout.instant"),
   },
-  {
-    id: "cash",
-    name: t("client.checkout.cashName"),
-    icon: Store,
-    description: t("client.checkout.cashDesc"),
-    tag: t("client.checkout.flexible"),
-  },
+  // {
+  //   id: "cash",
+  //   name: t("client.checkout.cashName"),
+  //   icon: Store,
+  //   description: t("client.checkout.cashDesc"),
+  //   tag: t("client.checkout.flexible"),
+  // },
 ]);
 
 const selectedMethod = ref("bakong");
@@ -232,11 +232,13 @@ const handleQRClose = async (isPaid) => {
   isProcessing.value = true;
   try {
     if (bId) {
-      await bookingService.cancelBooking(bId, { skipGlobalError: true });
+      try {
+        await bookingService.cancelBooking(bId, { skipGlobalError: true });
+      } catch (e) {
+        console.error("Manual cancel failed:", e);
+      }
     }
     uiStore.showToast(t("payments.paymentFailed"), "warning");
-  } catch (error) {
-    console.error("Failed to cancel unpaid booking:", error);
   } finally {
     isProcessing.value = false;
     isHandlingQRClose.value = false;
@@ -258,13 +260,12 @@ const handleQRExpired = async () => {
   isProcessing.value = true;
   try {
     if (bId) {
-      // Cancel the booking on the backend when QR expires
       await bookingService.cancelBooking(bId, { skipGlobalError: true });
     }
     // Clear local state
-    // Modal is kept open to show expired state; state is cleared
     bookingStore.paymentData = null;
     showBakongQR.value = false;
+    uiStore.showToast(t("payments.paymentExpired"), "warning");
   } catch (error) {
     console.error("Failed to handle payment expiration:", error);
   } finally {

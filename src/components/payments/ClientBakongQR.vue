@@ -61,10 +61,14 @@
             </div>
           </div>
 
-          <button @click="downloadQR" class="btn-client-secondary bg-slate-900 dark:bg-white/[0.05] border border-slate-800 dark:border-white/[0.1] text-white hover:bg-slate-800 dark:hover:bg-white/[0.08]">
-            <Download :size="18" />
-            <span>{{ $t("payments.saveQR") || "Save QR Image" }}</span>
-          </button>
+          <div class="screenshot-info-premium bg-amber-50/50 dark:bg-amber-500/10 border border-amber-200/50 dark:border-amber-500/20 text-amber-700 dark:text-amber-400">
+            <div class="info-icon">
+              <Camera :size="18" />
+            </div>
+            <p class="info-message">
+              {{ $t("payments.screenshotInstruction") }}
+            </p>
+          </div>
 
           <p class="hint-text-premium text-slate-400 dark:text-neutral-500">{{ $t("payments.scanToPay") }}</p>
         </div>
@@ -108,7 +112,7 @@ import { ref, onUnmounted, computed, watch } from "vue";
 import QrcodeVue from "qrcode.vue";
 import {
   X,
-  Download,
+  Camera,
   AlertCircle,
   CheckCircle,
   Clock,
@@ -134,21 +138,6 @@ const qrRef = ref(null);
 const remainingTime = ref(0);
 const isPaid = ref(false);
 const hasExpiredToast = ref(false);
-
-const downloadQR = () => {
-  const canvas = qrRef.value.querySelector("canvas");
-  if (!canvas) return;
-
-  const link = document.createElement("a");
-  link.download = `cinema-qr-${props.payment.md5?.substring(0, 8) || "payment"}.png`;
-  link.href = canvas.toDataURL("image/png");
-  link.click();
-
-  uiStore.showToast(
-    t("messages.qrSaved") || "QR Code saved to your device",
-    "success",
-  );
-};
 
 let countdownInterval = null;
 let successTimeout = null;
@@ -285,7 +274,6 @@ const startCountdown = () => {
 
     if (time <= 0 && !hasExpiredToast.value && !isPaid.value) {
       hasExpiredToast.value = true;
-      uiStore.showToast(t("payments.paymentExpired"), "warning");
       stopActivities();
       // Notify parent that payment has expired
       emit("expired");
@@ -406,14 +394,20 @@ onUnmounted(() => stopActivities());
   width: 32px;
   height: 32px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.6);
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #374151;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
+}
+
+.dark .close-action-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #a8abb2;
 }
 
 .close-action-btn:hover {
@@ -433,10 +427,14 @@ onUnmounted(() => stopActivities());
 .label-muted {
   font-size: 10px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.4);
+  color: #4b5563;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   margin-bottom: 8px;
+}
+
+.dark .label-muted {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .price-display {
@@ -462,6 +460,10 @@ onUnmounted(() => stopActivities());
 .currency-code {
   font-size: 14px;
   font-weight: 700;
+  color: #4b5563;
+}
+
+.dark .currency-code {
   color: rgba(255, 255, 255, 0.5);
 }
 
@@ -554,9 +556,13 @@ onUnmounted(() => stopActivities());
   display: block;
   font-size: 9px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.4);
+  color: #4b5563;
   text-transform: uppercase;
   margin-bottom: -2px;
+}
+
+.dark .timer-label {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .btn-client-primary {
@@ -604,11 +610,36 @@ onUnmounted(() => stopActivities());
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+.screenshot-info-premium {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 16px;
+  width: 100%;
+  text-align: left;
+}
+
+.info-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.info-message {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
 .hint-text-premium {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
+  color: #4b5563;
   text-align: center;
   line-height: 1.6;
+}
+
+.dark .hint-text-premium {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .status-view-unique {
@@ -656,8 +687,12 @@ onUnmounted(() => stopActivities());
 
 .status-subtitle-premium {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
+  color: #4b5563;
   font-weight: 500;
+}
+
+.dark .status-subtitle-premium {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .btn-client-dismiss {
@@ -666,7 +701,8 @@ onUnmounted(() => stopActivities());
   background: transparent;
   /* border: 1px solid rgba(255, 255, 255, 0.08); */
   border-radius: 16px;
-  /* color: rgba(255, 255, 255, 0.5); */
+  color: #1f2937;
+  border-color: #d1d5db;
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
@@ -674,6 +710,10 @@ onUnmounted(() => stopActivities());
   cursor: pointer;
   transition: all 0.2s;
   margin-top: 16px;
+}
+
+.dark .btn-client-dismiss {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .btn-client-dismiss:hover {

@@ -869,6 +869,7 @@ export default {
     paymentDetails: "ព័ត៌មានលម្អិតការបង់ប្រាក់",
     paymentMethod: "វិធីសាស្រ្តបង់ប្រាក់",
     expiresIn: "ផុតកំណត់ក្នុង",
+    screenshotInstruction: "សូមថតរូបអេក្រង់ (Screenshot) នៃ QR កូដនេះ ដើម្បីបង់ប្រាក់តាមរយៈកម្មវិធីធនាគាររបស់អ្នក។",
     paymentFailed:
       "ការបង់ប្រាក់មិនទាន់បានបញ្ចប់។ ការកក់របស់អ្នកត្រូវបានលុបចោល។",
     paymentExpired: "ការទូទាត់បានផុតកំណត់",

@@ -152,6 +152,10 @@ export const bookingService = {
     return response.data;
   },
 
+  async cancelBooking(id, config = {}) {
+    return this.expireBooking(id, config);
+  },
+
   /**
    * Delete a booking (admin soft delete).
    * @param {string} id - The booking ID.

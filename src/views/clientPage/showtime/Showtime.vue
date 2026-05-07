@@ -108,6 +108,7 @@ const loadShowtimes = async () => {
             title: s.movie_title,
             poster: s.movie_poster,
             hall: s.hall_name,
+            theater_name: s.theater_name,
             duration: movieService.formatDuration(s.duration_minutes),
             genre: genreText,
             availableSeats: available,
@@ -407,7 +408,7 @@ const handleReserveSeats = () => {
                       stroke-width="2"
                       class="text-neutral-500"
                     />
-                    {{ movie.hall }}
+                    {{ movie.theater_name }} • {{ movie.hall }}
                   </span>
                   <span class="flex items-center gap-1.5">
                     <Clock

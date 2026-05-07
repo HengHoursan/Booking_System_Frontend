@@ -77,7 +77,7 @@
           </div>
           <div class="meta-row">
             <el-icon class="meta-icon"><Location /></el-icon>
-            <span class="meta-text">{{ showtime.hall_name }}</span>
+            <span class="meta-text">{{ showtime.theater_name }} • {{ showtime.hall_name }}</span>
             <el-icon class="meta-icon" style="margin-left: 12px"
               ><Clock
             /></el-icon>
