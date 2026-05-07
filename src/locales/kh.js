@@ -472,6 +472,8 @@ export default {
 
   // Theater Management
   theaters: {
+    theater: "រោងកុន",
+    selectTheater: "ជ្រើសរើសរោងកុន",
     title: "គ្រប់គ្រងរោងកុន",
     allTheaters: "រោងកុនទាំងអស់",
     addTheater: "បន្ថែមរោងកុន",
@@ -513,6 +515,8 @@ export default {
 
   // Hall Management
   halls: {
+    hall: "សាល",
+    selectHall: "ជ្រើសរើសសាល",
     title: "គ្រប់គ្រងសាល",
     allHalls: "សាលទាំងអស់",
     addHall: "បន្ថែមសាល",

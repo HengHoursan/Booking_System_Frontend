@@ -574,6 +574,8 @@ export default {
   },
   // Theater Management
   theaters: {
+    theater: "Theater",
+    selectTheater: "Select Theater",
     halls: "Halls",
     title: "Theater Management",
     allTheaters: "All Theaters",
@@ -630,6 +632,8 @@ export default {
   },
   // Hall Management
   halls: {
+    hall: "Hall",
+    selectHall: "Select Hall",
     title: "Hall Management",
     allHalls: "All Halls",
     addHall: "Add Hall",

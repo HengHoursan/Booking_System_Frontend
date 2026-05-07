@@ -14,6 +14,50 @@
             <el-radio-button label="tomorrow">{{ $t('actions.tomorrow') || 'Tomorrow' }}</el-radio-button>
           </el-radio-group>
         </div>
+
+        <div class="theater-filters">
+          <div class="filter-item">
+            <span class="filter-label">{{ $t('theaters.theater') }}</span>
+            <el-select 
+              v-model="filters.theater_id" 
+              :placeholder="$t('theaters.selectTheater')"
+              clearable
+              size="default"
+              style="width: 180px"
+              @change="onTheaterChange"
+            >
+              <el-option
+                v-for="theater in theaters"
+                :key="theater.id"
+                :label="theater.name"
+                :value="theater.id"
+              />
+            </el-select>
+          </div>
+
+          <div class="filter-item">
+            <span class="filter-label">{{ $t('halls.hall') }}</span>
+            <el-select 
+              v-model="filters.hall_id" 
+              :placeholder="$t('halls.selectHall')"
+              clearable
+              size="default"
+              :disabled="!filters.theater_id"
+              style="width: 150px"
+              @change="loadShowtimes"
+            >
+              <el-option
+                v-for="hall in halls"
+                :key="hall.id"
+                :label="hall.hall_name"
+                :value="hall.id"
+              />
+            </el-select>
+          </div>
+        </div>
+      </div>
+
+      <div class="showtime-section-header">
         <div class="showtime-label">
           <el-icon><Clock /></el-icon>
           <span>{{ $t('showtimes.title') || 'Showtimes' }}:</span>
@@ -57,6 +101,8 @@ import { onMounted, reactive, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { ElMessage } from "element-plus";
 import { showtimeService } from "@/services/showtimeService";
+import { theaterService } from "@/services/theaterService";
+import { hallService } from "@/services/hallService";
 import { useAppStore } from "@/stores/app";
 import SeatLayoutPreview from "@/components/dashboard/SeatLayoutPreview.vue";
 import { Calendar, Clock } from "@element-plus/icons-vue";
@@ -70,12 +116,38 @@ const loading = reactive({
   showtimes: false,
 });
 const showtimes = ref([]);
+const theaters = ref([]);
+const halls = ref([]);
 const selectedDateFilter = ref("today");
 const selectedDate = ref(dayjs().format("YYYY-MM-DD"));
 
 const filters = reactive({
   showtimeId: "",
+  theater_id: "",
+  hall_id: "",
 });
+
+const loadTheaters = async () => {
+  try {
+    const response = await theaterService.getTheaters({ status: "active" });
+    theaters.value = response.data || [];
+  } catch (error) {
+    console.error("Failed to load theaters:", error);
+  }
+};
+
+const loadHalls = async (theaterId) => {
+  if (!theaterId) {
+    halls.value = [];
+    return;
+  }
+  try {
+    const response = await hallService.getHalls({ theater_id: theaterId });
+    halls.value = response.data || [];
+  } catch (error) {
+    console.error("Failed to load halls:", error);
+  }
+};
 
 // Load full showtimes for the picker
 const loadShowtimes = async () => {
@@ -83,6 +155,8 @@ const loadShowtimes = async () => {
   try {
     const response = await showtimeService.getShowtimes({
       show_date: selectedDate.value,
+      theater_id: filters.theater_id || undefined,
+      hall_id: filters.hall_id || undefined,
       status: "scheduled",
       forBooking: true,
       per_page: 50,
@@ -105,6 +179,12 @@ const loadShowtimes = async () => {
   }
 };
 
+const onTheaterChange = (val) => {
+  filters.hall_id = "";
+  loadHalls(val);
+  loadShowtimes();
+};
+
 const onDateFilterChange = (val) => {
   if (val === "today") {
     selectedDate.value = dayjs().format("YYYY-MM-DD");
@@ -125,6 +205,7 @@ const handleFilterChange = () => {
 
 // Lifecycle
 onMounted(async () => {
+  loadTheaters();
   await loadShowtimes();
   appStore.setBreadcrumbs([
     { title: t("nav.dashboard"), path: "/admin/dashboard" },
@@ -149,8 +230,33 @@ onMounted(async () => {
 
 .picker-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 24px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--el-border-color-extra-light);
+}
+
+.theater-filters {
+  display: flex;
+  gap: 20px;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--el-text-color-secondary);
+}
+
+.showtime-section-header {
   margin-bottom: 12px;
 }
 

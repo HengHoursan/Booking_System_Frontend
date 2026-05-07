@@ -59,7 +59,7 @@
 
     <!-- Visual Showtime Picker -->
     <el-card class="showtime-picker-card" shadow="never">
-      <div class="picker-header">
+      <div class="showtime-section-header">
         <div class="showtime-label">
           <el-icon><Clock /></el-icon>
           <span>{{ $t('showtimes.pastShowtimes') || 'Past Showtimes' }}:</span>
@@ -549,6 +549,10 @@ onMounted(() => {
 .showtime-label .el-icon {
   font-size: 16px;
   color: var(--el-color-primary);
+}
+
+.showtime-section-header {
+  margin-bottom: 12px;
 }
 
 .showtime-list-container {
