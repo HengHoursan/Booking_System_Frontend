@@ -8,69 +8,49 @@
     <!-- Filters -->
     <el-card class="filter-card" shadow="never">
       <el-form :inline="true" class="filter-form">
-        <el-form-item>
-          <el-input
-            v-model="filters.search"
-            :placeholder="$t('seats.search')"
-            :prefix-icon="Search"
-            clearable
-            @keyup.enter="loadSeatBookingHistory"
-            @clear="loadSeatBookingHistory"
-            style="width: 230px"
-          />
-        </el-form-item>
-        <!-- Removed old showtime dropdown -->
-        <el-form-item>
+        <el-form-item :label="$t('showtimes.showDate')">
           <el-date-picker
             v-model="filters.show_date"
             type="date"
-            :placeholder="$t('showtimes.showDate')"
+            :placeholder="$t('showtimes.showDate') || 'Select Show Date'"
             clearable
-            style="width: 200px"
+            style="width: 160px"
             value-format="YYYY-MM-DD"
+            @change="onDateChange"
           />
         </el-form-item>
-        <!-- <el-form-item>
-          <el-time-picker
-            v-model="filters.start_time"
-            :placeholder="$t('showtimes.startTime')"
-            format="HH:mm"
-            value-format="HH:mm"
-            clearable
-            style="width: 150px"
-          />
-        </el-form-item> -->
 
-        <el-form-item>
-          <el-select
-            v-model="filters.action"
+        <el-form-item :label="$t('theaters.theater')">
+          <el-select 
+            v-model="filters.theater_id" 
+            :placeholder="$t('theaters.selectTheater')"
             clearable
-            :placeholder="$t('seats.filterByStatus')"
-            @change="handleFilterChange"
-            style="min-width: 200px"
+            style="width: 200px"
+            @change="onTheaterChange"
           >
             <el-option
-              v-for="action in seatBookingActions"
-              :key="action.value"
-              :label="$t(`seats.statuses.${action.value}`)"
-              :value="action.value"
+              v-for="theater in theaters"
+              :key="theater.id"
+              :label="theater.name"
+              :value="theater.id"
             />
           </el-select>
         </el-form-item>
 
-        <el-form-item>
-          <el-select
-            v-model="filters.seat_type"
-            :placeholder="$t('seats.filterByType')"
+        <el-form-item :label="$t('halls.hall')">
+          <el-select 
+            v-model="filters.hall_id" 
+            :placeholder="$t('halls.selectHall')"
             clearable
-            @change="handleFilterChange"
-            style="min-width: 200px"
+            :disabled="!filters.theater_id"
+            style="width: 160px"
+            @change="loadShowtimes"
           >
             <el-option
-              v-for="type in seatTypes"
-              :key="type.value"
-              :label="$t(`seats.types.${type.value}`)"
-              :value="type.value"
+              v-for="hall in halls"
+              :key="hall.id"
+              :label="hall.hall_name"
+              :value="hall.id"
             />
           </el-select>
         </el-form-item>
@@ -80,15 +60,9 @@
     <!-- Visual Showtime Picker -->
     <el-card class="showtime-picker-card" shadow="never">
       <div class="picker-header">
-        <div class="date-selector">
-          <el-radio-group v-model="selectedDateFilter" size="default" @change="onDateFilterChange">
-            <el-radio-button label="today">{{ $t('actions.today') || 'Today' }}</el-radio-button>
-            <el-radio-button label="tomorrow">{{ $t('actions.tomorrow') || 'Tomorrow' }}</el-radio-button>
-          </el-radio-group>
-        </div>
         <div class="showtime-label">
           <el-icon><Clock /></el-icon>
-          <span>{{ $t('showtimes.title') || 'Showtimes' }}:</span>
+          <span>{{ $t('showtimes.pastShowtimes') || 'Past Showtimes' }}:</span>
         </div>
       </div>
 
@@ -114,150 +88,43 @@
       </div>
     </el-card>
 
-    <!-- Seats Table -->
-    <el-card shadow="never">
-      <el-table
-        :data="seatBookingHistory"
-        v-loading="loading.seatBookingHistory"
-        style="width: 100%"
-        :element-loading-text="$t('common.loading')"
-        :empty-text="$t('messages.noData')"
-        row-key="_id"
-      >
-        <el-table-column
-          prop="booking.reference_code"
-          :label="$t('bookings.referenceCode')"
-          width="150"
-        />
-        <el-table-column :label="$t('customers.customer')" width="250">
-          <template #default="{ row }">
-            <div v-if="row.booking">
-              <div>
-                <strong>
-                  {{
-                    row.booking.name ||
-                    (row.booking.phone
-                      ? "Walk-in Customer"
-                      : row.booking.email
-                        ? "Guest Customer"
-                        : "-")
-                  }}
-                </strong>
-              </div>
-              <div
-                v-if="row.booking.phone"
-                class="text-muted"
-                style="display: flex; align-items: center; gap: 4px"
-              >
-                <el-icon><Phone /></el-icon>
-                <span>{{ toLocalPhone(row.booking.phone) }}</span>
-              </div>
-              <div
-                v-if="row.booking.email"
-                class="text-muted"
-                style="display: flex; align-items: center; gap: 4px"
-              >
-                <el-icon><ChatLineSquare /></el-icon>
-                <span>{{ row.booking.email }}</span>
-              </div>
-              <el-tag
-                :type="getCustomerTypeTag(row.booking.customerType)"
-                size="small"
-                v-if="row.booking.customerType"
-                style="margin-top: 4px"
-              >
-                {{ $t(`customers.${row.booking.customerType}`) }}
-              </el-tag>
-            </div>
-            <div v-else>
-              <span class="text-muted">No customer data</span>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="showtime.movie"
-          :label="$t('movies.movieTitle')"
-          width="250"
-        />
-        <el-table-column :label="$t('seats.indentifier')" width="150">
-          <template #default="{ row }">
-            <div class="seat-tags">
-              <el-tag
-                v-for="seat in row.seats"
-                :key="seat._id"
-                size="small"
-                effect="plain"
-                class="seat-tag"
-              >
-                {{ seat.seat_identifier }}
-              </el-tag>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('seats.type')" width="180">
-          <template #default="{ row }">
-            <div class="seat-types">
-              <el-tag
-                v-for="(type, index) in [
-                  ...new Set(row.seats.map((s) => s.seat_type)),
-                ]"
-                :key="index"
-                :type="getSeatTypeColor(type)"
-                size="small"
-                class="type-tag"
-              >
-                {{ $t(`seats.types.${type}`) }}
-              </el-tag>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="showtime.show_date"
-          :label="$t('showtimes.showDate')"
-          width="200"
-          ><template #default="{ row }">
-            {{ formatDate(row.showtime.show_date) }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="showtime.start_time"
-          :label="$t('showtimes.startTime')"
-          width="200"
-        />
-        <el-table-column prop="action" :label="$t('seats.status')" width="150">
-          <template #default="{ row }">
-            <el-tag :type="getActionColor(row.action)">
-              {{ $t(`seats.statuses.${row.action}`) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <!-- <el-table-column :label="$t('common.actions')" fixed="right" width="100">
-          <template #default="{ row }">
-            <el-button
-              v-if="row.booking"
-              size="small"
-              type="primary"
-              plain
-              @click="viewBooking(row.booking._id)"
-            >
-              {{ $t('actions.view') }}
-            </el-button>
-          </template>
-        </el-table-column> -->
-      </el-table>
+    <!-- Occupancy Stats -->
+    <div v-if="filters.showtimeId" class="occupancy-stats animate-in">
+      <el-row :gutter="20">
+        <el-col :span="6">
+          <div class="stat-card">
+            <div class="stat-label">{{ $t('dashboard.totalCapacity') }}</div>
+            <div class="stat-value">{{ occupancy.total }}</div>
+          </div>
+        </el-col>
+        <el-col :span="6">
+          <div class="stat-card booked">
+            <div class="stat-label">{{ $t('dashboard.bookedSeats') }}</div>
+            <div class="stat-value">{{ occupancy.booked }}</div>
+          </div>
+        </el-col>
+        <el-col :span="6">
+          <div class="stat-card free">
+            <div class="stat-label">{{ $t('dashboard.freeSeats') }}</div>
+            <div class="stat-value">{{ occupancy.free }}</div>
+          </div>
+        </el-col>
+        <el-col :span="6">
+          <div class="stat-card" :class="{ 'is-full': occupancy.isFull }">
+            <div class="stat-label">{{ $t('bookings.occupancy') }}</div>
+            <div class="stat-value">{{ occupancy.isFull ? $t('bookings.full') : occupancy.percent + '%' }}</div>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
 
-      <!-- Pagination -->
-      <div class="pagination-wrapper" v-if="pagination.total > 0">
-        <el-pagination
-          v-model:current-page="pagination.currentPage"
-          v-model:page-size="pagination.perPage"
-          :page-sizes="[10, 20, 50, 100]"
-          :total="pagination.total"
-          layout="total, sizes, prev, pager, next, jumper"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
+    <!-- Visual Layout Preview -->
+    <el-card v-if="filters.showtimeId" shadow="never" class="mt-4">
+      <SeatLayoutPreview 
+        :showtime-id="filters.showtimeId" 
+        hide-header
+        readonly 
+      />
     </el-card>
   </div>
 </template>
@@ -268,10 +135,14 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { showtimeService } from "@/services/showtimeService";
+import { theaterService } from "@/services/theaterService";
+import { hallService } from "@/services/hallService";
 import { seatBookingService } from "@/services/seatBookingService";
 import { useAppStore } from "@/stores/app";
 import { formatDate, toLocalPhone } from "@/utils/formatters";
 import { Search, Phone, ChatLineSquare, Calendar, Clock } from "@element-plus/icons-vue";
+import SeatLayoutPreview from "@/components/dashboard/SeatLayoutPreview.vue";
+import { seatService } from "@/services/seatService";
 import dayjs from "dayjs";
 
 const { t } = useI18n();
@@ -297,14 +168,22 @@ const seatBookingHistory = ref([]);
 const showtimeList = ref([]);
 const selectedDateFilter = ref("today");
 const selectedDate = ref(dayjs().format("YYYY-MM-DD"));
+const theaters = ref([]);
+const halls = ref([]);
 
 const filters = reactive({
-  search: "",
-  action: "",
   showtimeId: "",
-  seat_type: "",
-  show_date: "",
-  start_time: "",
+  show_date: dayjs().format("YYYY-MM-DD"),
+  theater_id: "",
+  hall_id: "",
+});
+
+const occupancy = reactive({
+  total: 0,
+  booked: 0,
+  free: 0,
+  percent: 0,
+  isFull: false
 });
 
 const getCustomerTypeTag = (type) => {
@@ -337,18 +216,45 @@ const pagination = reactive({
 });
 
 // Load filter data
+const loadTheaters = async () => {
+  try {
+    const response = await theaterService.getTheaters({ status: "active" });
+    theaters.value = response.data || [];
+  } catch (error) {
+    console.error("Failed to load theaters:", error);
+  }
+};
+
+const loadHalls = async (theaterId) => {
+  if (!theaterId) {
+    halls.value = [];
+    return;
+  }
+  try {
+    const response = await hallService.getHalls({ theater_id: theaterId });
+    halls.value = response.data || [];
+  } catch (error) {
+    console.error("Failed to load halls:", error);
+  }
+};
+
 const loadShowtimes = async () => {
   loading.showtimes = true;
   try {
     const response = await showtimeService.getShowtimes({
-      show_date: selectedDate.value,
-      status: "scheduled",
-      forBooking: true,
+      show_date: filters.show_date,
+      theater_id: filters.theater_id || undefined,
+      hall_id: filters.hall_id || undefined,
       per_page: 50,
       sort_by: "start_time",
       sort_order: "asc",
     });
     showtimeList.value = response.data || [];
+    
+    // Clear selected showtime if it's no longer in the list
+    if (filters.showtimeId && !showtimeList.value.find(s => s.id === filters.showtimeId)) {
+      filters.showtimeId = "";
+    }
   } catch (error) {
     console.error("Failed to load showtimes:", error);
   } finally {
@@ -356,22 +262,45 @@ const loadShowtimes = async () => {
   }
 };
 
-const onDateFilterChange = (val) => {
-  if (val === "today") {
-    selectedDate.value = dayjs().format("YYYY-MM-DD");
-    loadShowtimes();
-  } else if (val === "tomorrow") {
-    selectedDate.value = dayjs().add(1, "day").format("YYYY-MM-DD");
+const onTheaterChange = (val) => {
+  filters.hall_id = "";
+  loadHalls(val);
+  loadShowtimes();
+};
+
+const calculateOccupancy = async (showtimeId) => {
+  const showtime = showtimeList.value.find(s => s.id === showtimeId);
+  if (!showtime) return;
+
+  try {
+    const [bookedResponse, allSeatsResponse] = await Promise.all([
+      seatBookingService.getSeatBookings({
+        showtimeId,
+        status: "booked",
+        limit: 1,
+      }),
+      seatService.getSeatsByHall(showtime.hall_id, { per_page: 100 })
+    ]);
+
+    occupancy.booked = bookedResponse.total || 0;
+    occupancy.total = allSeatsResponse.data.length || 0;
+    occupancy.free = occupancy.total - occupancy.booked;
+    occupancy.percent = occupancy.total > 0 ? Math.round((occupancy.booked / occupancy.total) * 100) : 0;
+    occupancy.isFull = occupancy.total > 0 && occupancy.booked >= occupancy.total;
+  } catch (e) {
+    console.error("Failed to calculate occupancy:", e);
+  }
+};
+
+const onDateChange = (val) => {
+  if (val) {
     loadShowtimes();
   }
 };
 
 const selectShowtime = (id) => {
-  if (filters.showtimeId === id) {
-    filters.showtimeId = ""; // Toggle off if clicked again
-  } else {
-    filters.showtimeId = id;
-  }
+  filters.showtimeId = id;
+  calculateOccupancy(id);
   handleFilterChange();
 };
 
@@ -470,9 +399,9 @@ watch(
 );
 
 // Lifecycle
-onMounted(async () => {
-  await loadShowtimes();
-  await loadSeatBookingHistory();
+onMounted(() => {
+  loadTheaters();
+  loadShowtimes();
   appStore.setBreadcrumbs([
     { title: t("nav.dashboard"), path: "/admin/dashboard" },
     {
@@ -522,6 +451,77 @@ onMounted(async () => {
   margin-top: 16px;
   display: flex;
   justify-content: center;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Occupancy Stats */
+.occupancy-stats {
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--el-bg-color);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--el-border-color-lighter);
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--el-text-color-primary);
+}
+
+.stat-card.booked .stat-value {
+  color: var(--el-color-primary);
+}
+
+.stat-card.free .stat-value {
+  color: var(--el-color-success);
+}
+
+.stat-card.is-full {
+  background: var(--el-color-danger-light-9);
+  border-color: var(--el-color-danger-light-5);
+}
+
+.stat-card.is-full .stat-value {
+  color: var(--el-color-danger);
+}
+
+.grid-view-container {
+  margin-top: 10px;
+}
+
+/* Animations */
+.animate-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Showtime Picker Styling */

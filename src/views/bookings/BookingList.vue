@@ -401,7 +401,7 @@
     </el-dialog>
 
     <!-- Bakong Payment Dialog -->
-    <el-dialog
+    <!-- <el-dialog
       v-model="showBakongDialog"
       :title="$t('payments.bakongPayment')"
       width="400px"
@@ -416,7 +416,7 @@
         @regenerate="handleRegenerateQR"
         style="margin: 0 auto"
       />
-    </el-dialog>
+    </el-dialog> -->
 
     <!-- Edit Seats Dialog -->
     <el-dialog
