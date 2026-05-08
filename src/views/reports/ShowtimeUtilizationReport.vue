@@ -105,19 +105,19 @@
         <el-table-column
           prop="theater_name"
           :label="$t('reports.theater')"
-          width="180"
+          width="250"
           show-overflow-tooltip
         />
         <el-table-column
           prop="hall_name"
           :label="$t('reports.hall')"
-          width="140"
+          width="120"
           show-overflow-tooltip
         />
         <el-table-column
           prop="total_seats_available"
           :label="$t('reports.totalSeatsAvailable')"
-          width="180"
+          width="200"
           align="center"
           sortable
         />
@@ -131,7 +131,7 @@
         <el-table-column
           prop="seats_available"
           :label="$t('reports.seatsAvailable')"
-          width="150"
+          width="180"
           align="center"
           sortable
         />
@@ -164,7 +164,7 @@
             >
           </template>
         </el-table-column>
-        <el-table-column
+        <!-- <el-table-column
           prop="revenue_per_seat"
           :label="$t('reports.revenuePerSeat')"
           width="170"
@@ -174,11 +174,11 @@
           <template #default="{ row }">
             <span>${{ row.revenue_per_seat?.toFixed(2) }}</span>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column
           prop="booking_count"
           :label="$t('reports.bookingCount')"
-          width="140"
+          width="160"
           align="center"
           sortable
         />

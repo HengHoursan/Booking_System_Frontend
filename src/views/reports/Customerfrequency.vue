@@ -71,7 +71,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column
+        <!-- <el-table-column
           prop="customer_email"
           :label="$t('reports.email')"
           min-width="180"
@@ -79,7 +79,7 @@
           <template #default="{ row }">
             <span>{{ row.customer_email || "" }}</span>
           </template>
-        </el-table-column>
+        </el-table-column> -->
 
         <el-table-column
           prop="total_bookings"

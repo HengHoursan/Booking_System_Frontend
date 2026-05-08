@@ -52,7 +52,7 @@
         <el-table-column prop="name" :label="$t('users.name')" />
         <el-table-column prop="username" :label="$t('users.username')" />
         <el-table-column prop="email" :label="$t('users.email')" />
-        <el-table-column prop="phone" :label="$t('users.phone')" width="120">
+        <el-table-column prop="phone" :label="$t('users.phone')" width="180">
           <template #default="{ row }">
             <span v-if="row.phone">{{ row.phone }}</span>
             <el-text v-else type="info" size="small">{{ $t('common.notSet') }}</el-text>
