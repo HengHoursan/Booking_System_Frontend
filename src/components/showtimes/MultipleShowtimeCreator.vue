@@ -90,6 +90,7 @@
           :placeholder="$t('showtimes.selectShowDate')"
           style="width: 100%"
           value-format="YYYY-MM-DD"
+          :disabled-date="disabledDate"
         />
       </el-form-item>
 
@@ -104,6 +105,8 @@
           format="HH:mm"
           value-format="HH:mm"
           style="width: 100%"
+          :disabled-hours="() => getDisabledHours(item.show_date)"
+          :disabled-minutes="(hour) => getDisabledMinutes(hour, item.show_date)"
         />
       </el-form-item>
 
@@ -409,6 +412,46 @@ const calculateEndTime = (startTime, durationMinutes) => {
   const hh = String(startDate.getHours()).padStart(2, "0");
   const mm = String(startDate.getMinutes()).padStart(2, "0");
   return `${hh}:${mm}`;
+};
+
+const disabledDate = (time) => {
+  return time.getTime() < new Date().setHours(0, 0, 0, 0);
+};
+
+const getDisabledHours = (showDate) => {
+  if (!showDate) return [];
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const localToday = `${year}-${month}-${day}`;
+
+  if (showDate === localToday) {
+    const hours = [];
+    for (let i = 0; i < now.getHours(); i++) {
+      hours.push(i);
+    }
+    return hours;
+  }
+  return [];
+};
+
+const getDisabledMinutes = (hour, showDate) => {
+  if (!showDate) return [];
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const localToday = `${year}-${month}-${day}`;
+
+  if (showDate === localToday && hour === now.getHours()) {
+    const minutes = [];
+    for (let i = 0; i < now.getMinutes(); i++) {
+      minutes.push(i);
+    }
+    return minutes;
+  }
+  return [];
 };
 
 watch(
