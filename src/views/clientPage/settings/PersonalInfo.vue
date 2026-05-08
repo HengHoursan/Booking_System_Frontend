@@ -19,7 +19,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useUiStore } from "@/stores/uiStore";
 
 const router = useRouter();
-const { t } = useI18n();
+const { t, te } = useI18n();
 const authStore = useAuthStore();
 
 const isLoading = ref(false);
@@ -47,8 +47,15 @@ const editForm = ref({
 
 const initEditForm = () => {
   editForm.value = {
-    phone: toLocalPhone(userProfile.value.phone),
+    phone: toLocalPhone(userProfile.value.phone).replace(/\D/g, ""),
   };
+};
+
+const validatePhone = (phone) => {
+  if (!phone) return false;
+  // Validation: 9 or 10 digits (Cambodian standard)
+  const cleanPhone = phone.replace(/\D/g, "");
+  return cleanPhone.length >= 9 && cleanPhone.length <= 10;
 };
 
 watch(() => userProfile.value, initEditForm, { immediate: true });
@@ -67,9 +74,8 @@ const handleSave = async () => {
   try {
     isSaving.value = true;
     // Client-side phone validation
-    const phoneVal = editForm.value.phone.replace(/\D/g, ""); // Remove non-digits
-    if (!/^0\d{8,9}$/.test(phoneVal)) {
-      uiStore.showToast(t("validation.phoneInvalid"), "warning");
+    if (!validatePhone(editForm.value.phone)) {
+      uiStore.showToast(t("client.phoneNumberDialog.invalidPhone") || t("validation.phoneInvalid"), "warning");
       isSaving.value = false;
       return;
     }
@@ -85,10 +91,9 @@ const handleSave = async () => {
     uiStore.showToast(t("settings.updateSuccess"), "success");
   } catch (error) {
     console.error("Failed to update profile:", error);
-    uiStore.showToast(
-      error.response?.data?.message || t("settings.updateError"),
-      "error",
-    );
+    const msg = error.response?.data?.message;
+    const translatedMsg = msg && te(msg) ? t(msg) : (msg || t("profile.updateFailed"));
+    uiStore.showToast(translatedMsg, "error");
   } finally {
     isSaving.value = false;
   }

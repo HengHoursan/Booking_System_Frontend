@@ -7,7 +7,7 @@ import { ElNotification } from "element-plus";
 const socket = ref(null);
 const isConnected = ref(false);
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://janette-semiexposed-carline.ngrok-free.dev/api";
 const SOCKET_URL = API_BASE_URL.replace("/api", "");
 
 export const useSocket = () => {

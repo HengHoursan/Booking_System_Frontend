@@ -218,7 +218,7 @@ export const useAuthStore = defineStore("auth", () => {
       const isCustomer =
         user.value && ("customerType" in user.value || !("role" in user.value));
       const endpoint = isCustomer ? "/customer/auth/profile" : "/auth/profile";
-      const response = await api.put(endpoint, profileData);
+      const response = await api.put(endpoint, profileData, { skipGlobalError: true });
       const userData =
         response.data.user ||
         response.data.customer ||

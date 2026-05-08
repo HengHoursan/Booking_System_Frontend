@@ -9,7 +9,7 @@ const api = axios.create({
   baseURL:
     import.meta.env.VITE_API_BASE_URL
       ? `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_API_VERSION ? "/" + import.meta.env.VITE_API_VERSION : ""}`
-      : "http://localhost:8080/api/v1",
+      : "https://janette-semiexposed-carline.ngrok-free.dev/api/v1",
   timeout: parseInt(import.meta.env.VITE_API_TIMEOUT) || 10000,
   headers: {
     "Content-Type": "application/json",

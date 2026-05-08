@@ -204,7 +204,7 @@ export const paymentService = {
 
   // Constants
   PAYMENT_METHODS: [
-    { value: "Bakong", label: "Bakong", type: "success" },
+    // { value: "Bakong", label: "Bakong", type: "success" },
     { value: "Cash", label: "Cash", type: "primary" },
   ],
 

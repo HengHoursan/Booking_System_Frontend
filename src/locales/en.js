@@ -1690,6 +1690,7 @@ export default {
       save: "Save & Continue",
       cancel: "Cancel",
       invalidPhone: "Please enter a valid phone number",
+      phoneTaken: "This phone number is already taken by another account.",
     },
     confirmation: {
       title: "Booking Confirmed!",

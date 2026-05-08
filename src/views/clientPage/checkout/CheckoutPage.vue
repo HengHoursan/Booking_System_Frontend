@@ -22,7 +22,7 @@ import ClientBakongQR from "@/components/payments/ClientBakongQR.vue";
 import PhoneNumberDialog from "@/components/common/PhoneNumberDialog.vue";
 
 const router = useRouter();
-const { t } = useI18n();
+const { t, te } = useI18n();
 const bookingStore = useBookingStore();
 
 const paymentMethods = computed(() => [
@@ -59,17 +59,20 @@ const uiStore = useUiStore();
 
 const showPhoneDialog = ref(false);
 const isUpdatingPhone = ref(false);
+const phoneError = ref("");
 
 const savePhoneNumber = async (phone) => {
   isUpdatingPhone.value = true;
   try {
+    phoneError.value = "";
     await authStore.updateProfile({ phone });
     showPhoneDialog.value = false;
     // After saving, continue with booking
     handleCompleteBooking();
   } catch (error) {
     console.error("Failed to update phone number:", error);
-    uiStore.showToast(t("profile.updateFailed"), "error");
+    const msg = error.response?.data?.message;
+    phoneError.value = msg && te(msg) ? t(msg) : (msg || t("profile.updateFailed"));
   } finally {
     isUpdatingPhone.value = false;
   }
@@ -431,7 +434,9 @@ onMounted(() => {
     <PhoneNumberDialog
       v-model:show="showPhoneDialog"
       :is-updating="isUpdatingPhone"
+      :server-error="phoneError"
       @save="savePhoneNumber"
+      @clear-error="phoneError = ''"
     />
   </div>
 </template>

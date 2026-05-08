@@ -12,6 +12,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  serverError: {
+    type: String,
+    default: "",
+  },
 });
 
 const emit = defineEmits(["update:show", "save", "cancel"]);
@@ -30,6 +34,8 @@ const validatePhone = (phone) => {
 const handlePhoneInput = (e) => {
   const value = e.target.value.replace(/\D/g, "").substring(0, 10);
   phoneNumber.value = value;
+  error.value = "";
+  emit("clear-error");
 };
 
 const handleSave = () => {
@@ -124,8 +130,8 @@ watch(
                   :size="20"
                 />
               </div>
-              <p v-if="error" class="text-xs text-red-500 font-medium ml-1">
-                {{ error }}
+              <p v-if="error || serverError" class="text-xs text-red-500 font-medium ml-1">
+                {{ error || serverError }}
               </p>
             </div>
 
